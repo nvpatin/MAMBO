@@ -1,4 +1,5 @@
 rm(list = ls())
+source("ranRelPct.R")
 
 # Example occurrence data -------------------------------------------------
 
@@ -9,26 +10,6 @@ num.reads <- matrix(
   sample(0:30, num.samples * num.otus, replace = TRUE),
   ncol = num.samples
 )
-
-# Function to draw 'n' random relative percent matrices -------------------
-
-ranRelPct <- function(n, num.reads) {
-  coverage <- matrix(
-    rep(colSums(num.reads), each = nrow(num.reads)),
-    ncol = ncol(num.reads)
-  )
-
-  # fit beta shape parameters
-  beta.params <- array(
-    c(num.reads + 1, coverage - num.reads + 1),
-    dim = c(dim(num.reads), 2)
-  )
-
-  # draw n random matrices from beta distribution
-  replicate(n, {
-    apply(beta.params, c(1, 2), function(x) rbeta(1, x[1], x[2]))
-  }, simplify = FALSE)
-}
 
 
 # Test it -----------------------------------------------------------------
@@ -41,3 +22,5 @@ ran.1 <- ranRelPct(1, num.reads)
 
 # Ten random draws
 ran.10 <- ranRelPct(10, num.reads)
+
+
