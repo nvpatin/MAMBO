@@ -4,28 +4,20 @@ rm(list = ls())
 
 num.samples <- 5
 num.otus <- 10
-coverage.range <- c(10, 1000)
 
-# matrix of coverage
-coverage <- matrix(
-  sample(
-    min(coverage.range):max(coverage.range),
-    num.samples * num.otus,
-    replace = TRUE
-  ),
-  ncol = num.samples
-)
-
-# matrix of reads (limited by coverage
 num.reads <- matrix(
-  sapply(coverage, function(x) sample(0:x, 1)),
+  sample(0:30, num.samples * num.otus, replace = TRUE),
   ncol = num.samples
 )
 
+# Function to draw 'n' random relative percent matrices -------------------
 
-# Function to draw 'n' random % occurrence matrices -----------------------
+ranRelPct <- function(n, num.reads) {
+  coverage <- matrix(
+    rep(colSums(num.reads), each = nrow(num.reads)),
+    ncol = ncol(num.reads)
+  )
 
-ranPctReads <- function(n, num.reads, coverage) {
   # fit beta shape parameters
   beta.params <- array(
     c(num.reads + 1, coverage - num.reads + 1),
@@ -41,6 +33,11 @@ ranPctReads <- function(n, num.reads, coverage) {
 
 # Test it -----------------------------------------------------------------
 
-occ.mode <- num.reads / coverage
-ran.1 <- ranPctReads(1, num.reads, coverage)
-ran.10 <- ranPctReads(10, num.reads, coverage)
+# This is the mode (expected value) of the distribution
+rel.pct <- t(t(num.reads) / colSums(num.reads))
+
+# One random draw
+ran.1 <- ranRelPct(1, num.reads)
+
+# Ten random draws
+ran.10 <- ranRelPct(10, num.reads)
