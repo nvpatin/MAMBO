@@ -1,3 +1,4 @@
+#! /usr/local/bin/Rscript
 library(here)
 
 rm(list = ls())
@@ -20,4 +21,4 @@ ran.1 <- ranRelPct(1, num.reads.2)
 # Ten random draws
 ran.10 <- ranRelPct(10, num.reads)
 
-
+print(ran.1, sep=',')
