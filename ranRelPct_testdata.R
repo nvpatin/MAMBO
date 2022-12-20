@@ -1,11 +1,15 @@
 #! /usr/local/bin/Rscript
-library(here)
 
 rm(list = ls())
-source("/Users/nastassia.patin/GitHub/NOAA-NCAR-Hackathon/ranRelPct.R")
+library(here)
+source(here::here("ranRelPct.R"))
+
+# For accepting input arguments
+args <- commandArgs(trailingOnly=TRUE)
 
 # Run with Lasker 2018 data --------------------------------------------------------
-path <- here::here("Data", "Lasker2018_table_counts.tsv")
+name <- args[3]
+path <- here::here("Data", name)
 lasker2018 <- read.delim(path, row.names = 1)
 
 ran.lasker <- ranRelPct(lasker2018)
