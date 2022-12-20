@@ -22,7 +22,7 @@ num.reads[51:60, 51:80] <- num.reads[51:60, 51:80] + 500
 # Draw a sample -----------------------------------------------------------
 
 # draw one sample of relative percentages and transpose matrix so rows are samples
-ran1 <- t(ranRelPct(1, num.reads)[[1]])
+ran1 <- t(ranRelPct(num.reads))
 # convert relative percentages to log-odds so euclidean distances make sense
 lo.ran1 <- log(ran1 / (1 - ran1))
 # compute pairwise euclidean distance of samples
