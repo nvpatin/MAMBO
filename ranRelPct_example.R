@@ -18,9 +18,11 @@ num.reads <- matrix(
 rel.pct <- t(t(num.reads) / colSums(num.reads))
 
 # One random draw
-ran.1 <- ranRelPct(1, num.reads)
-
-# Ten random draws
-ran.10 <- ranRelPct(10, num.reads)
+ran.pct <- ranRelPct(num.reads)
 
 
+# Lasker 2018 data --------------------------------------------------------
+
+lasker2018 <- read.delim("Data/Lasker2018_table_counts.tsv", row.names = 1)
+
+ran.lasker <- ranRelPct(lasker2018)
