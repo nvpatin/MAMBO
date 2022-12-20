@@ -1,8 +1,6 @@
 #! /usr/local/bin/Rscript
-library(here)
-
 rm(list = ls())
-source("/Users/nastassia.patin/GitHub/NOAA-NCAR-Hackathon/ranRelPct.R")
+source("ranRelPct.R")
 
 # Example occurrence data -------------------------------------------------
 
@@ -24,11 +22,14 @@ rel.pct <- t(t(num.reads) / colSums(num.reads))
 # One random draw
 ran.pct <- ranRelPct(num.reads)
 
+rel.pct
+ran.pct
+
+
 # Lasker 2018 data --------------------------------------------------------
-path <- here::here("Data", "Lasker2018_table_counts.tsv")
-lasker2018 <- read.delim(path, row.names = 1)
+lasker2018 <- read.delim("Data/Lasker2018_table_counts.tsv", row.names = 1)
 
 ran.lasker <- ranRelPct(lasker2018)
 
-options(max.print=2510000)
-print(ran.lasker)
+# options(max.print=2510000)
+head(ran.lasker, 20)
