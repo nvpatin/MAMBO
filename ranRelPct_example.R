@@ -6,24 +6,23 @@ source("/Users/nastassia.patin/GitHub/NOAA-NCAR-Hackathon/ranRelPct.R")
 
 # Example occurrence data -------------------------------------------------
 
-#num.samples <- 5
+num.samples <- 5
 
-#num.otus <- 10
+num.otus <- 10
 
-#num.reads <- matrix(
-#  sample(0:30, num.samples * num.otus, replace = TRUE),
-#  ncol = num.samples
-#)
+num.reads <- matrix(
+  sample(0:30, num.samples * num.otus, replace = TRUE),
+  ncol = num.samples
+)
 
 
 # Test it -----------------------------------------------------------------
 
 # This is the mode (expected value) of the distribution
-#rel.pct <- t(t(num.reads) / colSums(num.reads))
+rel.pct <- t(t(num.reads) / colSums(num.reads))
 
 # One random draw
-#ran.pct <- ranRelPct(num.reads)
-
+ran.pct <- ranRelPct(num.reads)
 
 # Lasker 2018 data --------------------------------------------------------
 path <- here::here("Data", "Lasker2018_table_counts.tsv")
