@@ -5,3 +5,4 @@
 *.Rproj
 .DS_Store
 bayesian_results/*
+.DS_Store
