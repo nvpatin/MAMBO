@@ -33,5 +33,8 @@ ranRelPct <- function(x, num.cores = NULL) {
 
   # normalize random percents to unity and return matrix
   # (transposed back to original dimensions)
-  t(pct / rowSums(pct))
+  pct <- t(pct / rowSums(pct))
+  rownames(pct) <- rownames(x)
+  colnames(pct) <- colnames(x)
+  pct
 }
