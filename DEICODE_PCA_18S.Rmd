@@ -5,7 +5,7 @@ date: "2023-02-27"
 author: "Katie Pitz"
 ---
 
-# Run DEICODE PCA on dataset
+# Run DEICODE PCA on dataset 18S
 
 # Load libraries
 ```{r}
