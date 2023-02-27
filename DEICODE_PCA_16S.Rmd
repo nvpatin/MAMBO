@@ -17,12 +17,12 @@ library(lubridate) #for date modifications
 
 # Set Location to save results
 ```{r}
-marker = 'COI'
+marker = '16S'
 prefix = 'Merged2018'
 data_directory = "./Data/merged_data/"
 # Set directory to save plots
 plot_dir <- './figures/RPCA/'
-results_directory <- './Qiime_Results/COI/'
+results_directory <- './Qiime_Results/16S/'
 ```
 
 # load in data
@@ -86,8 +86,8 @@ filename = paste(results_directory, "Qiime2_meta.tsv", sep='')
 print(filename)
 
 samp.c %>%
-  select(seqID, Dataset ) %>%
-  rename('#SampleID' = seqID) %>%
+  select(SampleID, Dataset ) %>%
+  rename('#SampleID' = SampleID) %>%
   write_delim(filename, delim="\t")
 
 ```
@@ -98,7 +98,7 @@ samp.c %>%
 
 ```{bash engine.opts='-l'}
 # move into the directory where you are going to run the DEICODE script
-cd /Users/kpitz/github/NOAA-NCAR-Hackathon/Qiime_Results/COI
+cd /Users/kpitz/github/NOAA-NCAR-Hackathon/Qiime_Results/16S
 pwd
 
 # Activate the conda qiime2 enviroment - check version
@@ -147,13 +147,13 @@ meta <- samp.c %>%
   mutate(year = case_when(is.na(year) ~ year_Flyer,
                           TRUE ~ year)) %>%
   select(seqID, SampleID, year, Dataset) %>%
-  mutate(project = case_when(str_detect(seqID, 'CN18F')~'CN18F',
-                             str_detect(seqID, 'CN18S')~'CN18S',
-                             str_detect(seqID, 'Lasker18S')~'Lasker18S',
-                             TRUE ~ 'unknown')) %>%
+  mutate(project = case_when(str_detect(SampleID, 'CN18F')~'CN18F',
+                             str_detect(SampleID, 'CN18S')~'CN18S',
+                             str_detect(SampleID, 'Lasker18S')~'Lasker18S',
+                             TRUE ~ 'unknown')) # %>%
   #switch labels to join with pcdata later:
-  rename(FilterID = SampleID) %>%
-  rename(SampleID = seqID)
+  #rename(FilterID = SampleID) #%>%
+  #rename(SampleID = seqID)
 
 ```
 
