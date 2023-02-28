@@ -15,7 +15,7 @@ def ranRelPct(df, asLogOdds = True):
         ran_row = ran_row / ran_row.sum()
         return ran_row
     # apply function to every row to draw sample of relative percent occurrence
-    result = df.apply(lambda x: betaRow(x), axis = 1, result_type = 'expand') 
+    result = df.apply(betaRow, axis = 1, result_type = 'expand')
     # assign row and column names
     result.index = df.index.values
     result.columns = df.columns.values
@@ -25,13 +25,35 @@ def ranRelPct(df, asLogOdds = True):
     return result
 
 
+# Return data frame of a draw of relative percent of occurrence from a beta distribution
+# fit to observed occurrence counts
+#   df: data frame where rows = ASVs and columns = samples
+def ranRelPct_cupy(df, asLogOdds = True):
+    for i in range(df.shape[1]):
+        col = df.iloc[:,i]
+        a = col + 1
+        b = col.sum() - col + 1
+        beta_dist = cupy.random.beta(a,b)
+        beta_dist /= col.sum()
+        df.iloc[:,i] = beta_dist
+    # convert to log-odds if requested
+    if asLogOdds:
+        result = np.log(df / (1 - df))
+    return df.transpose()
+
+
 # Draws sample of relative percent of occurrence and conducts PCA
 #   df: data frame where rows = samples and columns = ASVs
 # Returns a dictionary containing :
 #   df: data frame containing a random draw of the original count data frame as log-odds
 #   scores: array of PCA scores
 #   loadings: array of PCA loadings
-def samplePCA(df, num_pcs):
+def samplePCA(df, num_pcs = None):
+    max_pcs = min(df.shape[0] - 1, df.shape[1] - 1)
+    if num_pcs is None:
+        num_pcs = max_pcs
+    elif num_pcs > max_pcs:
+        num_pcs = max_pcs
     ran_df = ranRelPct(df, asLogOdds = True)
     pca = PCA(n_components = num_pcs)
     pca_fit = pca.fit(ran_df)
