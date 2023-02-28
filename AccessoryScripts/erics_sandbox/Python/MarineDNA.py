@@ -15,7 +15,7 @@ def ranRelPct(df, asLogOdds = True):
         ran_row = ran_row / ran_row.sum()
         return ran_row
     # apply function to every row to draw sample of relative percent occurrence
-    result = df.apply(lambda x: betaRow(x), axis = 1, result_type = 'expand') 
+    result = df.apply(betaRow, axis = 1, result_type = 'expand')
     # assign row and column names
     result.index = df.index.values
     result.columns = df.columns.values
