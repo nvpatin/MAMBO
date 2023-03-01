@@ -37,8 +37,8 @@ def doPCA(df, num_pcs = None):
     pca = PCA(n_components = num_pcs)
     pca_fit = pca.fit(df)
     pca_results = {
-        "scores": pd.DataFrame(pca_fit.transform(df)),
-        "loadings": pd.DataFrame(np.transpose(pca_fit.components_))
+        "scores": pca_fit.transform(df),
+        "loadings": np.transpose(pca_fit.components_)
     }
     return pca_results
 
@@ -58,6 +58,7 @@ def harmonizeColumnSigns(mat_list):
 def sortLoadings(loading_list, pc, asvs, asRanks = False):
     import numpy as np
     from scipy.stats import rankdata
+    import pandas as pd
     # Harmonize signs across replicates
     harm_loadings = harmonizeColumnSigns(loading_list)
     # Create 3 dimensional array and select component 'pc'
@@ -71,6 +72,7 @@ def sortLoadings(loading_list, pc, asvs, asRanks = False):
     df = pd.DataFrame(loadings[row_sort, :])
     df.index = asvs[row_sort]
     return df
+
 
 # Does hierarchical clustering on data frame where rows are samples and columns are ASVs
 # Returns array of cluster labels for rows
