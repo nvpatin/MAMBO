@@ -47,6 +47,7 @@ def doPCA(df, num_pcs = None):
 # multiply all values in that column by -1
 def harmonizeColumnSigns(mat_list):
     import numpy as np
+    
     for i in range(1, len(mat_list)):
         for col in range(mat_list[i].shape[1]):
             if np.sign(mat_list[i][0, col]) != np.sign(mat_list[0][0, col]):
@@ -59,6 +60,7 @@ def sortLoadings(loading_list, pc, asvs, asRanks = False):
     import numpy as np
     from scipy.stats import rankdata
     import pandas as pd
+    
     # Harmonize signs across replicates
     harm_loadings = harmonizeColumnSigns(loading_list)
     # Create 3 dimensional array and select component 'pc'
@@ -78,6 +80,7 @@ def sortLoadings(loading_list, pc, asvs, asRanks = False):
 # Returns array of cluster labels for rows
 def doClustering(df, num_clusts, num_pcs = None):
     from sklearn.cluster import AgglomerativeClustering
+    
     agg_clust = AgglomerativeClustering(n_clusters = num_clusts, metric = "euclidean", linkage = "ward")
     labels = agg_clust.fit_predict(df)
     return labels.astype(str)
