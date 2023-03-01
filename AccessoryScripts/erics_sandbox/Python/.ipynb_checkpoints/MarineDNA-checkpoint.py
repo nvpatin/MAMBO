@@ -39,7 +39,7 @@ def ranRelPct_cupy(df, asLogOdds = True):
     # convert to log-odds if requested
     if asLogOdds:
         result = np.log(df / (1 - df))
-    return df.transpose()
+    return result.transpose()
 
 
 # Draws sample of relative percent of occurrence and conducts PCA
@@ -92,3 +92,12 @@ def sortLoadings(loading_list, pc, asvs, asRanks = False):
     df = pd.DataFrame(loadings[row_sort, :])
     df.index = asvs[row_sort]
     return df
+
+
+def sampleClust(df, n_clusts, n_pcs = None):
+    x = md.samplePCA(df, n_pcs)
+    test_df = x["df"]
+    test_scores = pd.DataFrame(x["scores"])
+    agg_clust = AgglomerativeClustering(n_clusters = n_clusts, metric = "euclidean", linkage = "ward")
+    labels = agg_clust.fit_predict(test_df)
+    return labels.astype(str)
