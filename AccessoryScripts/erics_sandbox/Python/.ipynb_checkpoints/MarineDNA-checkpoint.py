@@ -93,11 +93,10 @@ def sortLoadings(loading_list, pc, asvs, asRanks = False):
     df.index = asvs[row_sort]
     return df
 
-
-def sampleClust(df, n_clusts, n_pcs = None):
-    x = md.samplePCA(df, n_pcs)
-    test_df = x["df"]
-    test_scores = pd.DataFrame(x["scores"])
+def sampleClust(df, n_clusts, num_pcs = None):
+    from sklearn.cluster import AgglomerativeClustering
+    x = samplePCA(df, num_pcs = None)
     agg_clust = AgglomerativeClustering(n_clusters = n_clusts, metric = "euclidean", linkage = "ward")
-    labels = agg_clust.fit_predict(test_df)
-    return labels.astype(str)
+    labels = agg_clust.fit_predict(x["df"])
+    x["cluster"] = labels.astype(str)
+    return x
