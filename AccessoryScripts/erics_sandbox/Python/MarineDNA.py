@@ -2,17 +2,19 @@
 # fit to observed occurrence counts
 #   df: data frame where rows = ASVs and columns = samples
 def ranRelPct(df, asLogOdds = True):
+    import numpy as np
+    
     result = df.copy()
     for i in range(df.shape[1]):
         col = df.iloc[:,i]
         a = col + 1
         b = col.sum() - col + 1
-        beta_dist = cupy.random.beta(a,b)
+        beta_dist = np.random.beta(a,b)
         beta_dist /= beta_dist.sum()
         result.iloc[:,i] = beta_dist
     # convert to log-odds if requested
     if asLogOdds:
-        result = cupy.log(result / (1 - result))
+        result = np.log(result / (1 - result))
     return result.transpose()
 
 
@@ -23,6 +25,9 @@ def ranRelPct(df, asLogOdds = True):
 #   scores: array of PCA scores
 #   loadings: array of PCA loadings
 def doPCA(df, num_pcs = None):
+    import numpy as np
+    from sklearn.decomposition import PCA
+    
     max_pcs = min(df.shape[0] - 1, df.shape[1] - 1)
     if num_pcs is None:
         num_pcs = max_pcs
@@ -32,7 +37,7 @@ def doPCA(df, num_pcs = None):
     pca_fit = pca.fit(df)
     pca_results = {
         "scores": pca_fit.transform(df),
-        "loadings": cp.transpose(pca_fit.components_)
+        "loadings": np.transpose(pca_fit.components_)
     }
     return pca_results
 
@@ -72,3 +77,31 @@ def doClustering(df, num_clusts, num_pcs = None):
     agg_clust = AgglomerativeClustering(n_clusters = num_clusts, metric = "euclidean", linkage = "ward")
     labels = agg_clust.fit_predict(df)
     return labels.astype(str)
+
+# Function to create n_rep draws of df and assign n_clusters and returns percent of draws that had same relative 
+# cluster assignments
+def pctSame(df, n_clust, n_rep):
+    import pandas as pd
+    import numpy as np
+    import itertools
+    
+    if n_clust >= df.shape[0]:
+        return 100
+    
+    def isSameCluster(pws, df, col):
+        return df.iloc[pws[0], col] == df.iloc[pws[1], col]
+    
+    def maxSame(row):
+        return row.value_counts().max()
+    
+    # cluster a random sample of logit(relative percentages)
+    cluster_samples = [doClustering(ranRelPct(df), n_clust) for i in range(n_rep)]
+    cluster_samples = pd.DataFrame(cluster_samples).transpose()
+    # unique pairs of rows
+    pws_rows = itertools.combinations(range(cluster_samples.shape[0]), 2)
+    # identify pairs of samples that are in the same cluster (True) or in different clusters (False)
+    pws_same = pd.DataFrame([[isSameCluster(pair, cluster_samples, col) for col in range(cluster_samples.shape[1])] for pair in pws_rows])
+    # get the maximum number replicates that have the same value (True or False) for each sample
+    num_same = [maxSame(pws_same.iloc[row, :]) for row in range(pws_same.shape[0])]
+    # convert to percentage with maximum of same value across all replicates
+    return np.sum(num_same) * 100 / (pws_same.shape[0] * pws_same.shape[1])
