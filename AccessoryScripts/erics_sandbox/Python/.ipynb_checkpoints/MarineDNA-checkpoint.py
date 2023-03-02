@@ -2,21 +2,18 @@
 # fit to observed occurrence counts
 #   df: data frame where rows = ASVs and columns = samples
 def ranRelPct(df, asLogOdds = True):
+    import pandas as pd
     import numpy as np
     
-    result = df.copy()
-    for i in range(df.shape[1]):
-        col = df.iloc[:,i]
-        a = col + 1
-        b = col.sum() - col + 1
-        beta_dist = np.random.beta(a,b)
-        beta_dist /= beta_dist.sum()
-        result.iloc[:,i] = beta_dist
-    # convert to log-odds if requested
+    def betaCol(col):
+        beta_dist = np.random.beta(col + 1, col.sum() - col + 1)
+        return beta_dist / beta_dist.sum()
+    result = np.empty([df.shape[0], df.shape[1]])
+    for i in range(result.shape[1]):
+        result[:,i] = betaCol(df.iloc[:,i])
     if asLogOdds:
         result = np.log(result / (1 - result))
-    return result.transpose()
-
+    return pd.DataFrame(result, index = df.index, columns = df.columns).transpose()
 
 # Does PCA
 #   df: data frame where rows = samples and columns = ASVs
