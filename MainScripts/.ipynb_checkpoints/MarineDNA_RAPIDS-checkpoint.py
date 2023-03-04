@@ -80,10 +80,3 @@ def doClustering(df, num_clusts, num_pcs = None):
                          linkage = "single", output_type="cudf")
     labels = agg_clust.fit_predict(df)
     return labels.astype(int)
-
-# A function to test if row pws[0] is the same cluster as row pws[1] in column 'col'
-def isSameCluster(pws, df, col):
-    return df.iloc[pws[0], col] == df.iloc[pws[1], col]
-
-print(isSameCluster((1, 3), cluster_samples, 0))
-print(isSameCluster((0, 3), cluster_samples, 0))

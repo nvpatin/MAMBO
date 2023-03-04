@@ -1,3 +1,31 @@
+# Return 3-d array of Beta alpha and beta parameters for a data frame of raw read counts
+# Output dimensions are (parameters, ASVs, samples)
+def betaParams(raw_counts):
+    def colParams(col):
+        return (col + 1, col.sum() - col + 1)
+    return np.stack(
+        [colParams(raw_counts.iloc[:, i]) for i in range(raw_counts.shape[1])], 
+        axis = 2,
+        dtype = np.dtype(np.int64, metadata = {"asvs": asvs1.index, "samples": asvs1.columns})
+    )
+    
+# Return random draw from Beta distribution of read percentages.
+# Output is a data frame with rows = samples ad columns = ASVs
+def ranRelPct_new(beta_params, asLogOdds = True):
+    # function to draw from distribution and set percentages to sum to 1 for each sample
+    def betaCol(col):
+        beta_dist = np.random.beta(col[0, :], col[1, :])
+        return beta_dist / beta_dist.sum()
+    # pre-allocate result array (NOTE: transposes data structure)
+    result = np.empty([beta_params.shape[2], beta_params.shape[1]])
+    # draw from for each sample
+    for i in range(result.shape[0]):
+        result[i, :] = betaCol(beta_params[:, :, i])
+    if asLogOdds:
+        result = np.log(result / (1 - result))
+    return pd.DataFrame(result, index = beta_params.dtype.metadata["samples"], columns = beta_params.dtype.metadata["asvs"])
+
+
 # Return data frame of a draw of relative percent of occurrence from a beta distribution
 # fit to observed occurrence counts
 #   df: data frame where rows = ASVs and columns = samples
