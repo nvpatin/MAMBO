@@ -232,10 +232,6 @@ def plotScoreDistribution(scores, x = 0, y = 1):
         go.Layout(shapes = horiz_lines + vert_lines, autosize = False, width = 1000, height = 1000)
     ).show()
 
-    
-
-
-
 # Does hierarchical clustering on data frame where rows are samples and columns are ASVs
 # Returns array of cluster labels for rows
 def doClustering(df, num_clusts, num_pcs = None):
