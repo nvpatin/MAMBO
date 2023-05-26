@@ -28,9 +28,9 @@ def ranRelPct(df, asLogOdds = True):
 #   loadings: array of PCA loadings
 def doPCA(df, num_pcs = None):
     from cuml.decomposition import PCA
-    import numpy as np
+    import cupy as cp
     
-    max_pcs = min(df.shape[0] - 1, df.shape[1] - 1)
+    max_pcs = cp.minimum(df.shape[0] - 1, df.shape[1] - 1)
     if num_pcs is None:
         num_pcs = max_pcs
     elif num_pcs > max_pcs:
@@ -39,7 +39,7 @@ def doPCA(df, num_pcs = None):
     pca_fit = pca.fit(df)
     pca_results = {
         "scores": pca_fit.transform(df),
-        "loadings": np.transpose(pca_fit.components_)
+        "loadings": cp.transpose(pca_fit.components_)
     }
     return pca_results
 
@@ -80,13 +80,6 @@ def doClustering(df, num_clusts, num_pcs = None):
                          linkage = "single", output_type="cudf")
     labels = agg_clust.fit_predict(df)
     return labels.astype(int)
-
-# A function to test if row pws[0] is the same cluster as row pws[1] in column 'col'
-def isSameCluster(pws, df, col):
-    return df.iloc[pws[0], col] == df.iloc[pws[1], col]
-
-print(isSameCluster((1, 3), cluster_samples, 0))
-print(isSameCluster((0, 3), cluster_samples, 0))
 
 # Function to create n_rep draws of df and assign n_clusters and returns percent of draws that had same relative 
 # cluster assignments
