@@ -29,19 +29,22 @@ def ranRelPct_new(beta_params, asLogOdds = True):
 # Return data frame of a draw of relative percent of occurrence from a beta distribution
 # fit to observed occurrence counts
 #   df: data frame where rows = ASVs and columns = samples
+# This is the old version of the function, that is used in the RAPIDS version
 def ranRelPct(df, asLogOdds = True):
-    import pandas as pd
     import numpy as np
     
-    def betaCol(col):
-        beta_dist = np.random.beta(col + 1, col.sum() - col + 1)
-        return beta_dist / beta_dist.sum()
-    result = np.empty([df.shape[0], df.shape[1]])
-    for i in range(result.shape[1]):
-        result[:,i] = betaCol(df.iloc[:,i])
+    result = df.copy()
+    for i in range(df.shape[1]):
+        col = df.iloc[:,i]
+        a = col + 1
+        b = col.sum() - col + 1
+        beta_dist = np.random.beta(a,b)
+        beta_dist /= beta_dist.sum()
+        result.iloc[:,i] = beta_dist
+    # convert to log-odds if requested
     if asLogOdds:
         result = np.log(result / (1 - result))
-    return pd.DataFrame(result, index = df.index, columns = df.columns).transpose()
+    return result.transpose()
 
 # Does PCA
 #   df: data frame where rows = samples and columns = ASVs
@@ -126,6 +129,108 @@ def sortLoadings_std(loading_list, pc, asvs, asRanks = False):
     df.index = asvs[row_sort]
     return df
 
+# Returns a vector of logicals identifying values that are outside of the inter-quartile range
+def isOutlierIQR(x):
+    import numpy as np
+    
+    quarts = np.quantile(x, [0.25, 0.75])
+    iqr = np.diff(quarts)
+    lower = quarts[0] - 1.5 * iqr
+    upper = quarts[1] + 1.5 * iqr
+    thresh = [lower, upper]
+    return np.concatenate([xi <= thresh[0] or xi >= thresh[1] for xi in x])
+
+# Returns a vector of logicals identifying values that have Z-scores larger than the threshold
+def isOutlierZ(x, thresh = 3):
+    import scipy
+    
+    z = scipy.stats.zscore(x)
+    return abs(z) >= thresh
+
+
+def loadingSummary(loadings, pc, asv_labels, z_thresh = 3, pct_outlier_thresh = 0.95):
+    import numpy as np
+    import pandas
+    
+    metrics = {
+        'loadings': sortLoadings_std(loadings, 0, asv_labels),
+        'ranks': sortLoadings_std(loadings, 0, asv_labels, True)
+    }
+    metrics['outlier_IQR'] = metrics['loadings'].apply(isOutlierIQR)
+    metrics['outlier_Z'] = metrics['loadings'].apply(isOutlierZ, thresh = z_thresh)
+    
+    smry = pandas.DataFrame()
+    
+    smry['mean_loading'] = metrics['loadings'].apply(np.mean, axis = 1)
+    smry['median_loading'] = metrics['loadings'].apply(np.median, axis = 1)
+
+    smry['mean_rank'] = metrics['ranks'].apply(np.mean, axis = 1)
+    smry['median_rank'] = metrics['ranks'].apply(np.median, axis = 1)
+
+    smry['pct_outlier_IQR'] = metrics['outlier_IQR'].apply(np.mean, axis = 1)
+    smry['pct_outlier_Z'] = metrics['outlier_Z'].apply(np.mean, axis = 1)
+
+    return {
+        'metrics': metrics,
+        'smry': smry, 
+        'positive': smry[(smry['pct_outlier_Z'] > pct_outlier_thresh) & (smry['mean_loading'] > 0)],
+        'negative': smry[(smry['pct_outlier_Z'] > pct_outlier_thresh) & (smry['mean_loading'] < 0)].sort_values(by = 'mean_loading')
+    }
+
+
+def plotScoreDistribution(scores, x = 0, y = 1):
+    import pandas as pd
+    import numpy as np
+    import plotly.offline as pyo
+    import plotly.graph_objs as go
+    
+    score_list = md.harmonizeColumnSigns_std(scores)
+    score_arr = np.stack(score_list, axis = 2)
+
+    median_score = pd.DataFrame([[np.median(score_arr[row, col, :]) for col in range(score_arr.shape[1])] for row in range(score_arr.shape[0])])
+    min_score = pd.DataFrame([[np.min(score_arr[row, col, :]) for col in range(score_arr.shape[1])] for row in range(score_arr.shape[0])])
+    max_score = pd.DataFrame([[np.max(score_arr[row, col, :]) for col in range(score_arr.shape[1])] for row in range(score_arr.shape[0])])
+
+    medians = go.Scatter(
+        x = median_score.iloc[:, 0],
+        y = median_score.iloc[:, 1],
+        mode = 'markers'
+    )
+
+    horiz_lines = [
+        dict(
+            type = 'line',
+            x0 = min_score.iloc[i, 0],
+            y0 = median_score.iloc[i, 1],
+            x1 = max_score.iloc[i, 0],
+            y1 = median_score.iloc[i, 1],
+            line = dict(
+                color = 'grey',
+                width = 1
+            )
+        )
+        for i in range(median_score.shape[0])
+    ]
+
+    vert_lines = [
+        dict(
+            type = 'line',
+            x0 = median_score.iloc[i, 0],
+            y0 = min_score.iloc[i, 1],
+            x1 = median_score.iloc[i, 0],
+            y1 = max_score.iloc[i, 1],
+            line = dict(
+                color = 'grey',
+                width = 1
+            )
+        )
+        for i in range(median_score.shape[0])
+    ]
+
+    go.Figure(
+        medians, 
+        go.Layout(shapes = horiz_lines + vert_lines, autosize = False, width = 1000, height = 1000)
+    ).show()
 
 # Does hierarchical clustering on data frame where rows are samples and columns are ASVs
 # Returns array of cluster labels for rows

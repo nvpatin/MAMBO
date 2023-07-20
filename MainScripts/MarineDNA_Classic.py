@@ -29,6 +29,7 @@ def ranRelPct_new(beta_params, asLogOdds = True):
 # Return data frame of a draw of relative percent of occurrence from a beta distribution
 # fit to observed occurrence counts
 #   df: data frame where rows = ASVs and columns = samples
+# This is the old version of the function, that is used in the RAPIDS version
 def ranRelPct(df, asLogOdds = True):
     import numpy as np
     
