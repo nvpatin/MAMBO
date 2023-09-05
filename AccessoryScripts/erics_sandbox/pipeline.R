@@ -28,11 +28,11 @@ result <- lapply(1:10, function(i) {
   post <- jagsPClm(
     pc.resp = pca$'18s'$x[, 1:pca$'18s'$num.pcs],
     pc.preds = pca$'16s'$x[, 1:pca$'16s'$num.pcs],
-    chains = 20, 
+    chains = 3, 
     adapt = 500, 
-    burnin = 1e5, 
-    total.samples = 5e3, 
-    thin = 100
+    burnin = 1e3, 
+    total.samples = 1e3, 
+    thin = 10
   )
   
   cat('\n-------------\n')
