@@ -14,7 +14,7 @@ fl18s <- fl18s[dimnames(fl16s)[[1]], , ]
 
 
 # Multiple draws and Bayesian models --------------------------------------
-result <- lapply(1:5, function(i) {
+result <- lapply(1:10, function(i) {
   cat('\n-------------\n')
   cat('Replicate', i, '\n')
   cat('-------------\n\n')
@@ -28,17 +28,18 @@ result <- lapply(1:5, function(i) {
   post <- jagsPClm(
     pc.resp = pca$'18s'$x[, 1:pca$'18s'$num.pcs],
     pc.preds = pca$'16s'$x[, 1:pca$'16s'$num.pcs],
-    chains = 6, 
+    chains = 20, 
     adapt = 500, 
-    burnin = 3e4, 
-    total.samples = 1e3, 
-    thin = 10
+    burnin = 1e5, 
+    total.samples = 5e3, 
+    thin = 100
   )
   
   cat('\n-------------\n')
   cat('Time elapsed:', swfscMisc::autoUnits(post$timetaken), '\n')
   cat('-------------\n\n')
   
+  # Extract posterior and name dimensions -----------------------------------
   p <- swfscMisc::runjags2list(post)
   dimnames(p$intercept)[[1]] <-
     dimnames(p$b.prime)[[2]] <-
