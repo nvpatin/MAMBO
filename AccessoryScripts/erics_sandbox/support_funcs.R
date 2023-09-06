@@ -112,13 +112,14 @@ repBayesianPCAlm <- function(
     nrep, mcmc
 ) {
   # make sure rows are in same order for both sets of data
-  resp.beta <- resp.beta[dimnames(resp.preds)[[1]], , ]
+  resp.beta <- resp.beta[dimnames(pred.beta)[[1]], , ]
   
   # do nrep iterations, save results to list, and write to RDS file
-  res <- lapply(1:nrep, function(i) {
-    cat('\n-------------\n')
-    cat('Replicate', i, '\n')
-    cat('-------------\n\n')
+  start.time <- Sys.time()
+  reps <- lapply(1:nrep, function(i) {
+    message('\n-------------')
+    message('Begin replicate ', i)
+    message('-------------\n')
     
     # Extract PCs -------------------------------------------------------------
     pca <- setNames(
@@ -139,9 +140,9 @@ repBayesianPCAlm <- function(
       thin = mcmc$thin
     )
     
-    cat('\n-------------\n')
-    cat('Time elapsed:', format(round(post$timetaken, 2)), '\n')
-    cat('-------------\n\n')
+    message('\n-------------')
+    message('Replicate ', i, ' time elapsed: ', format(round(post$timetaken, 2)))
+    message('-------------\n')
     
     # Extract posterior and name dimensions -----------------------------------
     p <- swfscMisc::runjags2list(post)
@@ -152,10 +153,35 @@ repBayesianPCAlm <- function(
     dimnames(p$b.prime)[[2]] <-
       dimnames(p$w)[[2]] <- paste0(pred.label, '.PC', 1:pca[[pred.label]]$num.pcs)
     
-    list(pca = pca, post.smry = summary(post), post.list = p)
+    list(pca = pca, post.smry = summary(post, silent.jags = TRUE), post.list = p)
   })
+  end.time = Sys.time()
   
+  res <- list(
+    labels = c(run = run.label, resp = resp.label, pred = pred.label),
+    params = c(list(nrep = nrep), mcmc),
+    reps = reps,
+    run.time = list(
+      start = start.time,
+      end = end.time,
+      elapsed = difftime(end.time, start.time)
+    )
+  )
   saveRDS(res, paste0(run.label, '_', format(Sys.time(), '%Y%m%d_%H%M%S.rds')))
+  
+  message('\n-------------')
+  message('Number of replicates: ', nrep)
+  message('MCMC parameters:')
+  message('  Chains: ', mcmc$chains)
+  message('  Adapt: ', mcmc$adapt)
+  message('  Burnin: ', mcmc$burnin)
+  message('  Total Samples: ', mcmc$total.samples)
+  message('  Thinning: ', mcmc$thin)
+  message(
+    'Total elapsed time: ', format(round(swfscMisc::autoUnits(res$run.time$elapsed), 2)),
+    ' (', format(round(swfscMisc::autoUnits(res$run.time$elapsed / nrep), 2)), ' per replicate)'
+  )
+  message('-------------\n')
   
   invisible(res)
 }
@@ -229,7 +255,10 @@ contrastSummary <- function(results, d, pc, min.iter = length(results)) {
 
 
 switchSummary <- function(results, min.p = 0.75) {
-  min.pcs <- results |> 
+  resp <- results$labels['resp']
+  pred <- results$labels['pred']
+  
+  min.pcs <- results$reps |> 
     sapply(function(x) {
       sapply(x$pca, function(pca.x) pca.x$num.pcs)
     }) |> 
@@ -237,26 +266,26 @@ switchSummary <- function(results, min.p = 0.75) {
   
   w.post <- do.call(
     abind::abind,
-    c(lapply(results, function(x) {
-      apply(x$post.list$w[1:min.pcs['18s'], 1:min.pcs['16s'], ], c(1, 2), mean)
+    c(lapply(results$reps, function(x) {
+      apply(x$post.list$w[1:min.pcs[resp], 1:min.pcs[pred], ], c(1, 2), mean)
     }), list(along = 3))
   )
   dimnames(w.post)[[3]] <- 1:dim(w.post)[3]
-  names(dimnames(w.post)) <- c('pc.18s', 'pc.16s', 'rep')
+  names(dimnames(w.post)) <- c(resp, pred, 'rep')
+  
+  w.post <- w.post |> 
+    as.data.frame.table() |> 
+    setNames(c('resp', 'pred', 'rep', 'w')) |> 
+    mutate(rep = as.numeric(rep)) 
   
   smry <- w.post |> 
-    as.data.frame.table(responseName = 'w') |> 
-    mutate(rep = as.numeric(rep)) |> 
-    group_by(pc.16s, pc.18s) |> 
+    group_by(resp, pred) |> 
     summarize(median = median(w), .groups = 'drop') |> 
     filter(median > min.p)
   
-  p <- w.post |> 
-    as.data.frame.table(responseName = 'w') |> 
-    mutate(rep = as.numeric(rep)) |> 
-    ggplot() +
+  p <- ggplot(w.post) +
     geom_histogram(aes(w)) +
-    facet_grid(pc.16s ~ pc.18s)
+    facet_grid(pred ~ resp)
   print(p)
   
   smry
