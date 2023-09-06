@@ -1,4 +1,9 @@
 betaParams <- function(x) {
+  # read data if filename is given
+  if(is.character(x)) {
+    x <- read.delim(x, row.names = 1)
+  }
+  
   # by-sample (columns) coverage
   coverage <- colSums(x)
   
@@ -12,6 +17,10 @@ betaParams <- function(x) {
   )
   result
 }
+
+
+
+
 
 ranRelPct <- function(beta.params) {
   # draw random sample from beta distribution with shape parameters 'p'
@@ -102,7 +111,11 @@ repBayesianPCAlm <- function(
     run.label, resp.label, resp.beta, pred.label, pred.beta, 
     nrep, mcmc
 ) {
-  lapply(1:nrep, function(i) {
+  # make sure rows are in same order for both sets of data
+  resp.beta <- resp.beta[dimnames(resp.preds)[[1]], , ]
+  
+  # do nrep iterations, save results to list, and write to RDS file
+  res <- lapply(1:nrep, function(i) {
     cat('\n-------------\n')
     cat('Replicate', i, '\n')
     cat('-------------\n\n')
@@ -140,8 +153,11 @@ repBayesianPCAlm <- function(
       dimnames(p$w)[[2]] <- paste0(pred.label, '.PC', 1:pca[[pred.label]]$num.pcs)
     
     list(pca = pca, post.smry = summary(post), post.list = p)
-  }) |> 
-    saveRDS(paste0(run.label, '_', format(Sys.time(), '%Y%m%d_%H%M%S.rds')))
+  })
+  
+  saveRDS(res, paste0(run.label, '_', format(Sys.time(), '%Y%m%d_%H%M%S.rds')))
+  
+  invisible(res)
 }
 
 
