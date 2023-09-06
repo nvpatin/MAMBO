@@ -238,11 +238,11 @@ switchSummary <- function(results, min.p = 0.75) {
   w.post <- do.call(
     abind::abind,
     c(lapply(results, function(x) {
-      apply(x$post.list$w[1:min.pcs['16s'], 1:min.pcs['18s'], ], c(1, 2), mean)
+      apply(x$post.list$w[1:min.pcs['18s'], 1:min.pcs['16s'], ], c(1, 2), mean)
     }), list(along = 3))
   )
   dimnames(w.post)[[3]] <- 1:dim(w.post)[3]
-  names(dimnames(w.post)) <- c('pc.16s', 'pc.18s', 'rep')
+  names(dimnames(w.post)) <- c('pc.18s', 'pc.16s', 'rep')
   
   smry <- w.post |> 
     as.data.frame.table(responseName = 'w') |> 
