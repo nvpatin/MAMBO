@@ -27,4 +27,3 @@ repBayesianPCAlm(
     thin = 50
   )
 )
-

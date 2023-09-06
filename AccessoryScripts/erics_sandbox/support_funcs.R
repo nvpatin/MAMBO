@@ -133,11 +133,11 @@ repBayesianPCAlm <- function(
     # Extract posterior and name dimensions -----------------------------------
     p <- swfscMisc::runjags2list(post)
     dimnames(p$intercept)[[1]] <-
-      dimnames(p$b.prime)[[2]] <-
-      dimnames(p$w)[[2]] <-
+      dimnames(p$b.prime)[[1]] <-
+      dimnames(p$w)[[1]] <-
       dimnames(p$v)[[1]] <- paste0(resp.label, '.PC', 1:pca[[resp.label]]$num.pcs)
-    dimnames(p$b.prime)[[1]] <-
-      dimnames(p$w)[[1]] <- paste0(pred.label, '.PC', 1:pca[[pred.label]]$num.pcs)
+    dimnames(p$b.prime)[[2]] <-
+      dimnames(p$w)[[2]] <- paste0(pred.label, '.PC', 1:pca[[pred.label]]$num.pcs)
     
     list(pca = pca, post.smry = summary(post), post.list = p)
   }) |> 
