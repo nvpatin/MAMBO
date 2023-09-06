@@ -118,7 +118,7 @@ repBayesianPCAlm <- function(
   start.time <- Sys.time()
   reps <- lapply(1:nrep, function(i) {
     message('\n-------------')
-    message('Begin replicate ', i)
+    message(format(Sys.time()), ' : Begin replicate ', i)
     message('-------------\n')
     
     # Extract PCs -------------------------------------------------------------
@@ -141,7 +141,11 @@ repBayesianPCAlm <- function(
     )
     
     message('\n-------------')
-    message('Replicate ', i, ' time elapsed: ', format(round(post$timetaken, 2)))
+    message(
+      format(Sys.time()), ' : ',
+      'Replicate ', i, ' time elapsed: ', 
+      format(round(swfscMisc::autoUnits(post$timetaken), 2))
+    )
     message('-------------\n')
     
     # Extract posterior and name dimensions -----------------------------------
@@ -170,6 +174,7 @@ repBayesianPCAlm <- function(
   saveRDS(res, paste0(run.label, '_', format(Sys.time(), '%Y%m%d_%H%M%S.rds')))
   
   message('\n-------------')
+  message(format(Sys.time()), ' : End replicates')
   message('Number of replicates: ', nrep)
   message('MCMC parameters:')
   message('  Chains: ', mcmc$chains)
@@ -283,9 +288,14 @@ switchSummary <- function(results, min.p = 0.75) {
     summarize(median = median(w), .groups = 'drop') |> 
     filter(median > min.p)
   
-  p <- ggplot(w.post) +
-    geom_histogram(aes(w)) +
-    facet_grid(pred ~ resp)
+  p <- w.post |> 
+    left_join(smry, by = c('resp', 'pred')) |> 
+    mutate(to.highlight = !is.na(median)) |> 
+    ggplot() +
+    geom_histogram(aes(w, fill = to.highlight)) +
+    scale_fill_manual(values = c('black', 'red')) +
+    facet_grid(pred ~ resp) +
+    theme(legend.position = 'none')
   print(p)
   
   smry

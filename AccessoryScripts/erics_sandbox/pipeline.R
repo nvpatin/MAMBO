@@ -10,12 +10,12 @@ repBayesianPCAlm(
   resp.beta = fl18s,
   pred.label = '16s',
   pred.beta = fl16s, 
-  nrep = 4, 
+  nrep = 20, 
   mcmc = list(
-    chains = 6, 
+    chains = 5, 
     adapt = 500,
-    burnin = 1e3,
-    total.samples = 1e3,
-    thin = 1
+    burnin = 1e4,
+    total.samples = 5e3,
+    thin = 100
   )
 )
