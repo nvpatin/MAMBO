@@ -50,30 +50,30 @@ jagsPClm <- function(pc.resp, pc.preds, chains, adapt, burnin, total.samples, th
   )
   
   jags.model <- "model {
-    for(p in 1:num.resp) {
+    for(r in 1:num.resp) {
       # Prior for intercept
-      intercept[p] ~ dnorm(0, 5e-4)
+      intercept[r] ~ dnorm(0, 5e-4)
 
-      for(a in 1:num.preds) {
+      for(p in 1:num.preds) {
         # Draw of switch for coefficient occurrence
-        w[a, p] ~ dbern(0.5)
+        w[r, p] ~ dbern(0.5)
         
         # Prior for ASV coefficients
-        b[a, p] ~ dnorm(0, 1e-6)
+        b[r, p] ~ dnorm(0, 1e-6)
         
         # Modified (switched) ASV coefficient
-        b.prime[a, p] <- b[a, p] * w[a, p]
+        b.prime[r, p] <- b[r, p] * w[r, p]
       }
 
       # Prior for variance
-      v[p] ~ dunif(0, 1000)
-      tau[p] <- 1 / v[p]
+      v[r] ~ dunif(0, 1000)
+      tau[r] <- 1 / v[r]
     }
 
     for(i in 1:num.ind) {
-      for(p in 1:num.resp) {
-        mu[i, p] <- intercept[p] + inprod(b.prime[, p], pc.preds[i, ])
-        pc.resp[i, p] ~ dnorm(mu[i, p], tau[p])
+      for(r in 1:num.resp) {
+        mu[i, r] <- intercept[r] + inprod(b.prime[r, ], pc.preds[i, ])
+        pc.resp[i, r] ~ dnorm(mu[i, r], tau[r])
       }
     }
   }"
@@ -96,6 +96,54 @@ jagsPClm <- function(pc.resp, pc.preds, chains, adapt, burnin, total.samples, th
     thin = thin
   )
 }
+
+
+repBayesianPCAlm <- function(
+    run.label, resp.label, resp.beta, pred.label, pred.beta, 
+    nrep, mcmc
+) {
+  lapply(1:nrep, function(i) {
+    cat('\n-------------\n')
+    cat('Replicate', i, '\n')
+    cat('-------------\n\n')
+    
+    # Extract PCs -------------------------------------------------------------
+    pca <- setNames(
+      list(ranPCA(resp.beta), ranPCA(pred.beta)),
+      c(resp.label, pred.label)
+    )
+    pca[[resp.label]]$num.pcs <- numImpPCs(pca[[resp.label]])
+    pca[[pred.label]]$num.pcs <- numImpPCs(pca[[pred.label]])
+    
+    # Run Bayesian model ------------------------------------------------------
+    post <- jagsPClm(
+      pc.resp = pca[[resp.label]]$x[, 1:pca[[resp.label]]$num.pcs],
+      pc.preds = pca[[pred.label]]$x[, 1:pca[[pred.label]]$num.pcs],
+      chains = mcmc$chains, 
+      adapt = mcmc$adapt, 
+      burnin = mcmc$burnin, 
+      total.samples = mcmc$total.samples, 
+      thin = mcmc$thin
+    )
+    
+    cat('\n-------------\n')
+    cat('Time elapsed:', format(round(post$timetaken, 2)), '\n')
+    cat('-------------\n\n')
+    
+    # Extract posterior and name dimensions -----------------------------------
+    p <- swfscMisc::runjags2list(post)
+    dimnames(p$intercept)[[1]] <-
+      dimnames(p$b.prime)[[2]] <-
+      dimnames(p$w)[[2]] <-
+      dimnames(p$v)[[1]] <- paste0(resp.label, '.PC', 1:pca[[resp.label]]$num.pcs)
+    dimnames(p$b.prime)[[1]] <-
+      dimnames(p$w)[[1]] <- paste0(pred.label, '.PC', 1:pca[[pred.label]]$num.pcs)
+    
+    list(pca = pca, post.smry = summary(post), post.list = p)
+  }) |> 
+    saveRDS(paste0(run.label, '_', format(Sys.time(), '%Y%m%d_%H%M%S.rds')))
+}
+
 
 extractPC <- function(pca.list, pc, locus) {
   loadings <- sapply(pca.list, function(x) x$pca[[locus]]$rotation[, pc]) 
