@@ -1,0 +1,95 @@
+---
+title: "betaFunc_PCA"
+output: html_document
+date: "2023-09-13"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r libraries}
+library(ggplot2)
+library(tidyverse)
+```
+
+## Beta distribution function
+
+```{r beta}
+betaParams <- function(x) {
+  # read data if filename is given
+  if(is.character(x)) {
+    x <- read.delim(x, row.names = 1)
+  }
+  
+  # by-sample (columns) coverage
+  coverage <- colSums(x)
+  
+  # fit beta shape parameters (transpose matrix for recycling of coverage vector)
+  tx <- t(x)
+  result <- array(c(tx + 1, coverage - tx + 1), dim = c(dim(tx), 2))
+  dimnames(result) <- list(
+    colnames(x),
+    rownames(x),
+    c('shape1', 'shape2')
+  )
+  result
+}
+```
+
+## Random draw function
+
+```{r randomdraws}
+ranRelPct <- function(beta.params) {
+  # draw random sample from beta distribution with shape parameters 'p'
+  pct <- apply(beta.params, c(1, 2), function(p) rbeta(1, p[1], p[2]))
+  
+  # normalize random percents to unity and return matrix
+  # (transposed back to original dimensions)
+  pct <- t(pct / rowSums(pct))
+  rownames(pct) <- dimnames(beta.params)[[2]]
+  colnames(pct) <- dimnames(beta.params)[[1]]
+  pct
+}
+
+```
+
+## Perform PCA
+
+```{r PCA}
+ranPCA <- function(beta.params) {
+  prob <- t(ranRelPct(beta.params))
+  log(prob / (1 - prob)) |> 
+    prcomp() # |> summary() 
+}
+```
+
+```{r runfuncs}
+fl16s <- betaParams("/work/nvp29/Size_fractionation/Sizefrac_R/data/sizefrac_asv_table.tsv")
+```
+
+```{r PCAdata}
+# import metadata
+path <- "/work/nvp29/Size_fractionation/Sizefrac_R/datasizefrac_metadata.csv"
+meta <- read.csv(path)
+
+PCA <- ranPCA(fl16s)
+PCA_df <-PCA$x %>%
+  as.data.frame %>%
+  rownames_to_column("sample_name")
+PCA_plot <- inner_join(PCA_df, meta, by="sample_name")
+
+var_explained <- PCA$sdev^2/sum(PCA$sdev^2)
+```
+
+```{r PCA plot}
+p <- PCA_plot %>% ggplot(aes(x=PC1, y=PC2)) + 
+  geom_point(aes(color=filter_type, shape=depth_group_m), size=3) +
+  theme_classic() +
+  labs(x=paste("PC1: ",round(var_explained[1]*100,1),"%"),
+               y=paste("PC2: ",round(var_explained[2]*100,1),"%")) +
+  theme(legend.title = element_text(size=14),
+        legend.text = element_text(size=12))
+
+ggsave("/work/nvp29/Size_fractionation/Sizefrac_R/data/pca_test.png"), scatter_plot)
+```
