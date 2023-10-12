@@ -59,7 +59,7 @@ ranRelPct <- function(beta.params) {
 ```{r PCA}
 ranPCA <- function(beta.params) {
   prob <- t(ranRelPct(beta.params))
-  log(prob / (1 - prob)) |> 
+  log(prob / (1 - prob)) %>% 
     prcomp() # |> summary() 
 }
 ```
@@ -70,7 +70,7 @@ fl16s <- betaParams("/work/nvp29/Size_fractionation/Sizefrac_R/data/sizefrac_asv
 
 ```{r PCAdata}
 # import metadata
-path <- "/work/nvp29/Size_fractionation/Sizefrac_R/datasizefrac_metadata.csv"
+path <- "/work/nvp29/Size_fractionation/Sizefrac_R/data/sizefrac_metadata.csv"
 meta <- read.csv(path)
 
 PCA <- ranPCA(fl16s)
@@ -91,5 +91,5 @@ p <- PCA_plot %>% ggplot(aes(x=PC1, y=PC2)) +
   theme(legend.title = element_text(size=14),
         legend.text = element_text(size=12))
 
-ggsave("/work/nvp29/Size_fractionation/Sizefrac_R/data/pca_test.png"), scatter_plot)
+ggsave("/work/nvp29/Size_fractionation/Sizefrac_R/data/pca_test.png", scatter_plot)
 ```
