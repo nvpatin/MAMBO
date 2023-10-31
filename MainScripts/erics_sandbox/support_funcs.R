@@ -19,9 +19,6 @@ betaParams <- function(x) {
 }
 
 
-
-
-
 ranRelPct <- function(beta.params) {
   # draw random sample from beta distribution with shape parameters 'p'
   pct <- apply(beta.params, c(1, 2), function(p) rbeta(1, p[1], p[2]))
@@ -109,7 +106,7 @@ jagsPClm <- function(pc.resp, pc.preds, chains, adapt, burnin, total.samples, th
 
 repBayesianPCAlm <- function(
     run.label, resp.label, resp.beta, pred.label, pred.beta, 
-    nrep, mcmc
+    nrep, mcmc, output.log = TRUE
 ) {
   # make sure rows are in same order for both sets of data
   resp.beta <- resp.beta[dimnames(pred.beta)[[1]], , ]

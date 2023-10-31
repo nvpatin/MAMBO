@@ -1,0 +1,128 @@
+#' @title Run MAMBO replicates
+#' @description Run MAMBO replicates
+#'
+#' @param resp.label label for response data.
+#' @param resp.beta matrix of response beta parameters from \link{betaParams}.
+#' @param pred.label label for predictor data.
+#' @param pred.beta matrix of predictor beta parameters from \link{betaParams}.
+#' @param nrep number of MAMBO replicates to run.
+#' @param chains number of MCMC chains.
+#' @param adapt number of adaptation iterations.
+#' @param burnin number of burnin iterations.
+#' @param total.samples total number of samples from the posterior to save.
+#' @param thin number of iterations to skip between samples in each chain.
+#' @param run.label label for the run output.
+#' @param output.log create a text log of the run progress?
+#'
+#' @return a list of results.
+#'
+#' @author Eric Archer \email{eric.archer@@noaa.gov}
+#'
+#' @export
+#'
+mambo <- function(
+    resp.label, resp.beta, pred.label, pred.beta,
+    nrep = 10,
+    chains = 3,
+    adapt = 100,
+    burnin = 1000,
+    total.samples = 1000,
+    thin = 1,
+    run.label = 'mambo',
+    output.log = TRUE
+) {
+  if(output.log) {
+    log.file <- file(format(Sys.time(), 'mambo.%Y%m%d_%H%M%S.log'), open = 'a')
+    sink(file = log.file, type = 'output', split = TRUE)
+    sink(file = log.file, type = 'message')
+  }
+
+  # make sure rows are in same order for both sets of data
+  resp.beta <- resp.beta[dimnames(pred.beta)[[1]], , ]
+
+  # do nrep iterations, save results to list, and write to RDS file
+  start.time <- Sys.time()
+  reps <- lapply(1:nrep, function(i) {
+    message('\n-------------')
+    message(format(Sys.time()), ' : Begin replicate ', i)
+    message('-------------\n')
+
+    # Extract PCs -------------------------------------------------------------
+    message('  Extracting PCs...\n')
+    pca <- stats::setNames(
+      list(ranPCA(resp.beta), ranPCA(pred.beta)),
+      c(resp.label, pred.label)
+    )
+    pca[[resp.label]]$num.pcs <- numImpPCs(pca[[resp.label]])
+    pca[[pred.label]]$num.pcs <- numImpPCs(pca[[pred.label]])
+
+    # Run Bayesian model ------------------------------------------------------
+    message('  Running Bayesian model...\n')
+    post <- jagsPClm(
+      pc.resp = pca[[resp.label]]$x[, 1:pca[[resp.label]]$num.pcs],
+      pc.preds = pca[[pred.label]]$x[, 1:pca[[pred.label]]$num.pcs],
+      chains = chains,
+      adapt = adapt,
+      burnin = burnin,
+      total.samples = total.samples,
+      thin = thin
+    )
+
+    message('\n-------------')
+    message(
+      format(Sys.time()), ' : ',
+      'Replicate ', i, ' time elapsed: ',
+      format(round(swfscMisc::autoUnits(post$timetaken), 2))
+    )
+    message('-------------\n')
+
+    # Extract posterior and name dimensions -----------------------------------
+    p <- swfscMisc::runjags2list(post)
+    dimnames(p$intercept)[[1]] <-
+      dimnames(p$b.prime)[[1]] <-
+      dimnames(p$w)[[1]] <-
+      dimnames(p$v)[[1]] <- paste0(resp.label, '.PC', 1:pca[[resp.label]]$num.pcs)
+    dimnames(p$b.prime)[[2]] <-
+      dimnames(p$w)[[2]] <- paste0(pred.label, '.PC', 1:pca[[pred.label]]$num.pcs)
+
+    list(pca = pca, post.smry = summary(post, silent.jags = TRUE), post.list = p)
+  })
+  end.time = Sys.time()
+
+  res <- list(
+    labels = c(run = run.label, resp = resp.label, pred = pred.label),
+    params = c(
+      nrep = nrep, chains = chains, adapt = adapt,
+      burnin = burnin, total.samples = total.samples, thin = thin
+    ),
+    reps = reps,
+    run.time = list(
+      start = start.time,
+      end = end.time,
+      elapsed = difftime(end.time, start.time)
+    )
+  )
+  saveRDS(res, paste0(run.label, '.', format(Sys.time(), '%Y%m%d_%H%M%S.rds')))
+
+  message('\n-------------')
+  message(format(Sys.time()), ' : End replicates')
+  message('Number of replicates: ', nrep)
+  message('MCMC parameters:')
+  message('  Chains: ', chains)
+  message('  Adapt: ', adapt)
+  message('  Burnin: ', burnin)
+  message('  Total Samples: ', total.samples)
+  message('  Thinning: ', thin)
+  message(
+    'Total elapsed time: ', format(round(swfscMisc::autoUnits(res$run.time$elapsed), 2)),
+    ' (', format(round(swfscMisc::autoUnits(res$run.time$elapsed / nrep), 2)), ' per replicate)'
+  )
+  message('-------------\n')
+
+  if(output.log) {
+    sink(type = 'output')
+    sink(type = 'message')
+  }
+
+  invisible(res)
+}
