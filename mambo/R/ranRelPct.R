@@ -3,9 +3,18 @@
 #'
 #' @param beta.params matrix of beta parameters from \link{betaParams}.
 #'
-#' @return matrix of percet occurrences.
+#' @return matrix of random percent occurrences. Rows are ASVs and columns 
+#'   are samples.
 #'
 #' @author Eric Archer \email{eric.archer@@noaa.gov}
+#' 
+#' @examples
+#' # use built-in 16S data
+#' beta.16s <- betaParams(fl16s)
+#' str(beta.16s)
+#' 
+#' rel.pct <- ranRelPct(beta.16s)
+#' rel.pct[1:5, 1:3]
 #'
 #' @export
 #'

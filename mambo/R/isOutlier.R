@@ -10,6 +10,16 @@
 #' @return a vector of logicals identifying values that are outliers.
 #'
 #' @author Eric Archer \email{eric.archer@@noaa.gov}
+#' 
+#' @examples
+#' x <- rnorm(1000)
+#' summary(x)
+#' 
+#' x.iqr <- isOutlier(x, 'iqr')
+#' x[x.iqr]
+#' 
+#' x.z <- isOutlier(x, 'z')
+#' x[x.z]
 #'
 #' @export
 #'

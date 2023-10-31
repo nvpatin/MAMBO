@@ -4,14 +4,19 @@
 #' @param x either a filename of a tab-separated file containing ASV occurrence
 #'   data or a matrix of occurrence data.
 #'
-#' @return an array with parameters of beta distribution for the occurrence of
-#'   each ASV for each sample.
+#' @return a three dimensional array where the first dimension are the samples,
+#'   the second dimension are the ASVs, and the third dimension are the two beta 
+#'   shape parameters
 #'
 #' @author Eric Archer \email{eric.archer@@noaa.gov}
 #'
 #' @examples
-#' # Random occurrence matrix
-#'
+#' # use built-in 16S data
+#' beta.16s <- betaParams(fl16s)
+#' str(beta.16s)
+#' 
+#' # both shape parameters for first 5 samples and first 3 ASVs
+#' beta.16s[1:5, 1:3, ]
 #'
 #' @export
 #'
