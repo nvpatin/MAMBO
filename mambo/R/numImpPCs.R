@@ -9,7 +9,22 @@
 #' @author Eric Archer \email{eric.archer@@noaa.gov}
 #'
 #' @examples
-#' # Random occurrence matrix
+#' # use built-in 16S data
+#' beta.16s <- betaParams(fl16s)
+#' pca.16s <- ranPCA(beta.16s)
+#' 
+#' i <- numImpPCs(pca.16s)
+#' 
+#' # Number of variables
+#' ncol(pca.16s$importance)
+#' 
+#' # Expected proportion of variance
+#' 1 / ncol(pca.16s$importance)
+#' 
+#' # Number of important components
+#' i
+#' 
+#' pca.16s$importance[, 1:i]
 #'
 #' @export
 #'
