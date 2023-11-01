@@ -2,7 +2,7 @@
 #' @description Separate and sort positive and negative components
 #'
 #' @param results output of a \code{mambo} run.
-#' @param d response or predictor label.
+#' @param locus label name of response or predictor locus.
 #' @param pc principal component to summarize (1:n).
 #' @param min.rep minimum number of replicates to include.
 #'
@@ -13,9 +13,9 @@
 #'
 #' @export
 #'
-contrastSummary <- function(results, d, pc, min.rep = length(results)) {
+contrastSummary <- function(results, locus, pc, min.rep = length(results)) {
   res <- lapply(results, function(x) {
-    outlierLoadings(x$pca[[d]])[[pc]]
+    outlierLoadings(x$pca[[locus]])[[pc]]
   })
 
   pos <- lapply(res, function(x) names(x$pos)) |>

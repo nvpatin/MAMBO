@@ -11,15 +11,20 @@ betaParams(x)
 data or a matrix of occurrence data.}
 }
 \value{
-an array with parameters of beta distribution for the occurrence of
-  each ASV for each sample.
+a three dimensional array where the first dimension are the samples,
+  the second dimension are the ASVs, and the third dimension are the two beta 
+  shape parameters
 }
 \description{
 Fits shape paraemters of beta distribution to ASV occurrence data.
 }
 \examples{
-# Random occurrence matrix
+# use built-in 16S data
+beta.16s <- betaParams(fl16s)
+str(beta.16s)
 
+# both shape parameters for first 5 samples and first 3 ASVs
+beta.16s[1:5, 1:3, ]
 
 }
 \author{

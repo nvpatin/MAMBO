@@ -10,10 +10,20 @@ ranRelPct(beta.params)
 \item{beta.params}{matrix of beta parameters from \link{betaParams}.}
 }
 \value{
-matrix of percet occurrences.
+matrix of random percent occurrences. Rows are ASVs and columns 
+  are samples.
 }
 \description{
 Random sample of percent occurrence from beta parameters.
+}
+\examples{
+# use built-in 16S data
+beta.16s <- betaParams(fl16s)
+str(beta.16s)
+
+rel.pct <- ranRelPct(beta.16s)
+rel.pct[1:5, 1:3]
+
 }
 \author{
 Eric Archer \email{eric.archer@noaa.gov}

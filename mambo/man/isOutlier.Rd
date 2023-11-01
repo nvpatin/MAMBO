@@ -21,6 +21,17 @@ a vector of logicals identifying values that are outliers.
 \description{
 Separate and sort positive and negative components
 }
+\examples{
+x <- rnorm(1000)
+summary(x)
+
+x.iqr <- isOutlier(x, 'iqr')
+x[x.iqr]
+
+x.z <- isOutlier(x, 'z')
+x[x.z]
+
+}
 \author{
 Eric Archer \email{eric.archer@noaa.gov}
 }

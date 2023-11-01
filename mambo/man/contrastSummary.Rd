@@ -4,12 +4,12 @@
 \alias{contrastSummary}
 \title{Summary of principal component contrasts}
 \usage{
-contrastSummary(results, d, pc, min.rep = length(results))
+contrastSummary(results, locus, pc, min.rep = length(results))
 }
 \arguments{
 \item{results}{output of a \code{mambo} run.}
 
-\item{d}{response or predictor label.}
+\item{locus}{label name of response or predictor locus.}
 
 \item{pc}{principal component to summarize (1:n).}
 
