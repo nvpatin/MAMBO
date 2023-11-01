@@ -1,29 +1,58 @@
 #' @title Extract principal component loadings and scores
-#' @description Separate and sort positive and negative components
+#' @description Extract principal component loadings and scores.
 #'
-#' @param pca.list list of PCA results.
-#' @param pc principal component to summarize (1:n).
-#' @param locus name or number of locus to extract.
+#' @param results output of a \code{mambo} run.
 #'
-#' @return a list with component loadings (\code{$loadings}) and scores
-#'   (\code{$scores}).
+#' @return a list with a data frame of component loadings (\code{$loadings}) and scores
+#'   (\code{$scores}) for each locus.
 #'
 #' @author Eric Archer \email{eric.archer@@noaa.gov}
 #'
 #' @export
 #'
-extractPC <- function(pca.list, pc, locus) {
-  loadings <- sapply(pca.list, function(x) x$pca[[locus]]$rotation[, pc])
-  for(i in 1:nrow(loadings)) {
-    switch.sign <- sign(loadings[i, ]) != sign(loadings[i, 1])
-    loadings[i, switch.sign] <- loadings[i, switch.sign] * -1
-  }
-
-  scores <- sapply(pca.list, function(x) x$pca[[locus]]$x[, pc])
-  for(i in 1:nrow(scores)) {
-    switch.sign <- sign(scores[i, ]) != sign(scores[i, 1])
-    scores[i, switch.sign] <- scores[i, switch.sign] * -1
-  }
-
+extractPCA <- function(results) {
+  pca.list <- results$reps |> 
+    lapply(function(x) x$pca) |> 
+    purrr::list_transpose() |> 
+    lapply(purrr::list_transpose)
+  
+  loadings <- lapply(pca.list, function(x) {
+    res <- abind::abind(x$rotation, along = 3) |> 
+      apply(2, function(x) {
+        to.switch <- sign(x[1, ]) != sign(x[1, 1])
+        x[, to.switch] <- x[, to.switch] * -1
+        x
+      }, simplify = FALSE) |> 
+      abind::abind(along = 3) |> 
+      aperm(c(1, 3, 2))
+    dimnames(res)[[3]] <- 1:dim(res)[3]
+    as.data.frame.table(res) |> 
+      stats::setNames(c('sample', 'pc', 'rep', 'loading')) |> 
+      dplyr::mutate(
+        sample = as.character(sample),
+        pc = as.numeric(gsub('PC', '', pc)),
+        rep = as.numeric(rep)
+      )
+  })
+  
+  scores <- lapply(pca.list, function(x) {
+    res <- abind::abind(x$x, along = 3) |> 
+      apply(2, function(x) {
+        to.switch <- sign(x[1, ]) != sign(x[1, 1])
+        x[, to.switch] <- x[, to.switch] * -1
+        x
+      }, simplify = FALSE) |> 
+      abind::abind(along = 3) |> 
+      aperm(c(1, 3, 2))
+    dimnames(res)[[3]] <- 1:dim(res)[3]
+    as.data.frame.table(res) |> 
+      stats::setNames(c('sample', 'pc', 'rep', 'score')) |> 
+      dplyr::mutate(
+        sample = as.character(sample),
+        pc = as.numeric(gsub('PC', '', pc)),
+        rep = as.numeric(rep)
+      )
+  })
+  
   list(loadings = loadings, scores = scores)
 }

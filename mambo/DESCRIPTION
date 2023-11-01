@@ -25,5 +25,7 @@ Imports:
   abind,
   runjags,
   dplyr,
+  car,
+  purrr,
   ggplot2,
   swfscMisc
