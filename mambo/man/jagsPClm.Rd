@@ -22,7 +22,8 @@ jagsPClm(pc.resp, pc.preds, chains, adapt, burnin, total.samples, thin)
 \item{thin}{number of iterations to skip between samples in each chain.}
 }
 \value{
-a run.jags posterior mcmc object.
+a \code{runjags} object created by \code{\link[runjags]{run.jags}}.
+s
 }
 \description{
 Run a bayesian linear model with principal component response

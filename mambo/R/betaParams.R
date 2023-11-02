@@ -2,11 +2,12 @@
 #' @description Fits shape paraemters of beta distribution to ASV occurrence data.
 #'
 #' @param x either a filename of a tab-separated file containing ASV occurrence
-#'   data or a matrix of occurrence data.
+#'   data or a data frame of occurrence data. Occurrence data should have ASVs as 
+#'   rows and samples as columns. 
 #'
 #' @return a three dimensional array where the first dimension are the samples,
 #'   the second dimension are the ASVs, and the third dimension are the two beta 
-#'   shape parameters
+#'   shape parameters.
 #'
 #' @author Eric Archer \email{eric.archer@@noaa.gov}
 #'

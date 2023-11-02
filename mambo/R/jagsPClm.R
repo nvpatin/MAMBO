@@ -10,8 +10,8 @@
 #' @param total.samples total number of samples from the posterior to save.
 #' @param thin number of iterations to skip between samples in each chain.
 #'
-#' @return a run.jags posterior mcmc object.
-#'
+#' @return a \code{runjags} object created by \code{\link[runjags]{run.jags}}.
+#'s
 #' @author Eric Archer \email{eric.archer@@noaa.gov}
 #'
 #' @export

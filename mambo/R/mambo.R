@@ -14,7 +14,19 @@
 #' @param run.label label for the run output.
 #' @param output.log create a text log of the run progress?
 #'
-#' @return a list of results.
+#' @return a list containing:
+#' \describe{ 
+#'   \item{\code{$labels}}{the run, response and predictor labels.} 
+#'   \item{\code{$params}}{the MCMC run parameters.}
+#'   \item{\code{$reps}}{a list with results for each of \code{nrep} replicate runs.}
+#'   \item{\code{$run.time}}{a list of the start, end, and elapsed run times for all replicates.}
+#' }
+#' Each replicate in the \code{$reps} element contains:
+#' \describe{
+#'   \item{\code{$pca}}{a list of the response and predictor PCA results.}
+#'   \item{\code{$post.smry}}{summary of parameter posterior for the replicate.}
+#'   \item{\code{$post.list}}{list of posterior distribution for each parameter in the model.}
+#' }
 #'
 #' @author Eric Archer \email{eric.archer@@noaa.gov}
 #'
