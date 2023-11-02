@@ -23,7 +23,7 @@
 #'
 #' @export
 #'
-isOutlier <- function(x, type = c('iqr', 'z'), thresh = 3) {
+isOutlier <- function(x, type = c('z', 'iqr'), thresh = 3) {
   switch(
     match.arg(type),
     iqr = {

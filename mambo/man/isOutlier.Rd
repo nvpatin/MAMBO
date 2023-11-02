@@ -4,7 +4,7 @@
 \alias{isOutlier}
 \title{Identify outlier values}
 \usage{
-isOutlier(x, type = c("iqr", "z"), thresh = 3)
+isOutlier(x, type = c("z", "iqr"), thresh = 3)
 }
 \arguments{
 \item{x}{a vector of numbers.}

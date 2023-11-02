@@ -8,7 +8,7 @@ outlierLoadings(
   results,
   locus,
   pc,
-  type = c("iqr", "z"),
+  type = c("z", "iqr"),
   thresh = 3,
   min.pct.reps = 0.95
 )

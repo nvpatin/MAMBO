@@ -16,7 +16,7 @@
 #' @export
 #'
 outlierLoadings <- function(
-  results, locus, pc, type = c('iqr', 'z'), thresh = 3, min.pct.reps = 0.95
+  results, locus, pc, type = c('z', 'iqr'), thresh = 3, min.pct.reps = 0.95
 ) {
   extractPCA(results)$loadings[[locus]] |> 
     dplyr::rename(pcs = 'pc') |> 
