@@ -11,10 +11,7 @@
 #' @export
 #'
 extractPCA <- function(results) {
-  pca.list <- results$reps |> 
-    lapply(function(x) x$pca) |> 
-    purrr::list_transpose() |> 
-    lapply(purrr::list_transpose)
+  pca.list <- pcaList(results)
   
   loadings <- lapply(pca.list, function(x) {
     res <- abind::abind(x$rotation, along = 3) |> 
@@ -27,9 +24,9 @@ extractPCA <- function(results) {
       aperm(c(1, 3, 2))
     dimnames(res)[[3]] <- 1:dim(res)[3]
     as.data.frame.table(res) |> 
-      stats::setNames(c('sample', 'pc', 'rep', 'loading')) |> 
+      stats::setNames(c('asv', 'pc', 'rep', 'loading')) |> 
       dplyr::mutate(
-        sample = as.character(sample),
+        asv = as.character(asv),
         pc = as.numeric(gsub('PC', '', pc)),
         rep = as.numeric(rep)
       )

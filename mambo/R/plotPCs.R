@@ -36,5 +36,5 @@ plotPCs <- function(results, locus, pc.x = 1, pc.y = 2, ellipse.p = 0.95) {
       x = paste0('PC', pc.x),
       y = paste0('PC', pc.y)
     ) +
-    theme_minimal()
+    ggplot2::theme_minimal()
 }

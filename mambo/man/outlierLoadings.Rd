@@ -4,13 +4,33 @@
 \alias{outlierLoadings}
 \title{Outlier principal component loadings}
 \usage{
-outlierLoadings(pca)
+outlierLoadings(
+  results,
+  locus,
+  pc,
+  type = c("iqr", "z"),
+  thresh = 3,
+  min.pct.reps = 0.95
+)
 }
 \arguments{
-\item{pca}{principal component object.}
+\item{results}{output of a \link{mambo} run.}
+
+\item{locus}{label name of response or predictor locus.}
+
+\item{pc}{principal component to summarize (1:n).#'}
+
+\item{type}{choose outlier based on inter-quartile interval (\code{iqr}) or
+z-score (\code{z}).}
+
+\item{thresh}{if \code{type = 'z'}, the minimum z-score used to identify
+outliers.}
+
+\item{min.pct.reps}{minimum percent of replicates that an ASV should be 
+identified as an outlier in to be saved.}
 }
 \description{
-Return loadings of outlier ASVs
+Return loading summary of outlier ASVs.
 }
 \author{
 Eric Archer \email{eric.archer@noaa.gov}
