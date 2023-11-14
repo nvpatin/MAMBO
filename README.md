@@ -1,2 +1,6 @@
 # MAMBO: Metabarcoding Analysis using Modeled Bayesian Occurrences
 A program to analyze eDNA metabarcoding sequence data from multiple trophic levels to identify drivers and patterns of biodiversity in marine ecosystems. The input data are two metabarcoding data sets generated from two different marker genes targeting different trophic levels from the same eDNA sample. Analysis has three stages: 1) modeling sequence read counts as a beta distribution and using random draws from this distrubition to generate principal component analyses, 2) applying a Bayesian model to identify correlations between two different data sets, and 3) extracting the features (ASVs) with the greatest effect on the correlations. Created for the 2023 NOAA/NCAR Hackathon, part of the Open Hackathons program.
+
+## Installation notes
+Need to install JAGS on main system first.
+swfscMisc is a dependency, may have trouble installing that
