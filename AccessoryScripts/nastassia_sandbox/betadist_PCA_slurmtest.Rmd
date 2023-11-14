@@ -1,5 +1,5 @@
 ---
-title: "betaFunc_PCA"
+title: "betaFunc_PCA_slurmtest"
 output: html_document
 date: "2023-09-13"
 ---
@@ -91,5 +91,10 @@ p <- PCA_plot %>% ggplot(aes(x=PC1, y=PC2)) +
   theme(legend.title = element_text(size=14),
         legend.text = element_text(size=12))
 
+<<<<<<< HEAD
+ggsave("/work/nvp29/Size_fractionation/Sizefrac_R/data/pca_test.png", p)
+```
+=======
 ggsave("/work/nvp29/Size_fractionation/Sizefrac_R/data/pca_test.png", scatter_plot)
 ```
+>>>>>>> 091fdf3c8c4454734ade436c29be955a3ca92913
