@@ -1,0 +1,73 @@
+---
+title: "MAMBO vignette"
+output: html_document
+date: "2023-11-29"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is a tutorial for running metabarcoding data sets through MAMBO (Metabarcoding Analysis of Modeled Bayesian Occurrences). You should start with two ASV tables, each of which has columns as samples and rows as ASVs, with the first column listing each unique ASV.
+
+```{r libraries}
+library(mambo)
+library(tidyverse)
+```
+
+#### Import your ASV tables
+```{r data}
+df_16s <- read.csv("/Users/nastassiapatin/GitHub/MAMBO/Data/merged_data/no_duplicates/Merged2018_16S_otu_filtered.csv", row.names=1)
+
+df_18s <- read.csv("/Users/nastassiapatin/GitHub/MAMBO/Data/merged_data/no_duplicates/Merged2018_18S_otu_filtered.csv", row.names=1)
+```
+
+#### Generate beta distribution parameters
+```{r betadist}
+beta.16s.merged <- betaParams(df_16s)
+beta.18s.merged <- betaParams(df_18s)
+```
+
+#### Run MAMBO 
+```{r data, echo=FALSE}
+mambo('18s', beta.18s.merged, '16s', beta.16s.merged)
+```
+
+#### Import RDS file which as a summary of the model results
+# Can we generate a variable for the rds file name that we can call here instead of copying and pasting from the directory?
+```{r rds}
+rds <- readRDS("mambo.20231129_163755.rds")
+
+# Take a look at the labels, which will include predictor and response variables, each of which represent a different marker gene ("locus")
+rds$labels
+```
+
+### Plot the PCAs for each marker gene ("locus")
+```{r PCA}
+plotPCs(rds, '16s')
+```
+
+```{r PCA}
+plotPCs(rds, '18s')
+```
+#### Check which ASVs are outliers, ie driving the separations
+```{r outliers}
+outliers.16s <- outlierLoadings(rds, '16s', 1)
+```
+
+```{r outliers}
+outliers.18s <- outlierLoadings(rds, '18s', 1)
+```
+
+#### Import the taxonomy file and identify taxonomy of outlier ASVs
+```{r tax}
+tax <- read_delim("/Users/nastassiapatin/GitHub/MAMBO/Data/merged_data/no_duplicates/Merged2018_16S_taxa_filtered.csv")
+
+# Add column name to match ASV tibble column name if it doesn't already
+colnames(tax)[1] <- "asv"
+
+# Merge the tibbles
+asvs_out_tax <- left_join(asvs_out, tax, by="asv")
+```
