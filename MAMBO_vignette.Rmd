@@ -15,30 +15,38 @@ This is a tutorial for running metabarcoding data sets through MAMBO (Metabarcod
 ```{r libraries}
 library(mambo)
 library(tidyverse)
+library(here)
 ```
 
 #### Import your ASV tables
 ```{r data}
-df_16s <- read.csv("/Users/nastassiapatin/GitHub/MAMBO/Data/merged_data/no_duplicates/Merged2018_16S_otu_filtered.csv", row.names=1)
+df_16s <- read.csv(file=here("data", "Merged2018_16S_otu_filtered.csv"), row.names=1)
 
-df_18s <- read.csv("/Users/nastassiapatin/GitHub/MAMBO/Data/merged_data/no_duplicates/Merged2018_18S_otu_filtered.csv", row.names=1)
+df_18s <- read.csv(file=here("data", "Merged2018_18S_otu_filtered.csv"), row.names=1)
 ```
 
 #### Generate beta distribution parameters
-```{r betadist}
+```{r betaparams}
+# This step produces arrays containing sample information, including a) read counts + 1 and b) total read counts for each sample. We need both of these pieces of data to calculate the beta distributions.
+
 beta.16s.merged <- betaParams(df_16s)
 beta.18s.merged <- betaParams(df_18s)
 ```
-
+#### Check the parameters
+```{r check}
+# Check the read count and sample total read count for one element
+beta.16s.merged[1,1,]
+beta.18s.merged[1,1,]
+```
 #### Run MAMBO 
-```{r data, echo=FALSE}
+```{r data, include=FALSE}
 mambo('18s', beta.18s.merged, '16s', beta.16s.merged)
 ```
 
 #### Import RDS file which as a summary of the model results
 # Can we generate a variable for the rds file name that we can call here instead of copying and pasting from the directory?
 ```{r rds}
-rds <- readRDS("mambo.20231129_163755.rds")
+rds <- readRDS("mambo.20231204_144433.rds")
 
 # Take a look at the labels, which will include predictor and response variables, each of which represent a different marker gene ("locus")
 rds$labels
@@ -63,11 +71,14 @@ outliers.18s <- outlierLoadings(rds, '18s', 1)
 
 #### Import the taxonomy file and identify taxonomy of outlier ASVs
 ```{r tax}
-tax <- read_delim("/Users/nastassiapatin/GitHub/MAMBO/Data/merged_data/no_duplicates/Merged2018_16S_taxa_filtered.csv")
+tax_16s <- read_delim(file=here("data","Merged2018_16S_taxa_filtered.csv"))
+tax_18s <- read_delim(file=here("data","Merged2018_18S_taxa_filtered.csv"))
 
 # Add column name to match ASV tibble column name if it doesn't already
 colnames(tax)[1] <- "asv"
 
 # Merge the tibbles
-asvs_out_tax <- left_join(asvs_out, tax, by="asv")
+asvs_out_16s_tax <- left_join(outliers.16s, tax, by="asv")
+asvs_out_18s_tax <- left_join(outliers.18s, tax, by="asv")
 ```
+
