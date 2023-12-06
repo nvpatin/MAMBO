@@ -18,16 +18,18 @@ library(tidyverse)
 library(here)
 ```
 
-#### Import your ASV tables
+#### Import your ASV tables 
 ```{r data}
-df_16s <- read.csv(file=here("data", "Merged2018_16S_otu_filtered.csv"), row.names=1)
+# df_16s <- read.csv(file=here("data", "Merged2018_16S_otu_filtered.csv"), row.names=1)
+# df_18s <- read.csv(file=here("data", "Merged2018_18S_otu_filtered.csv"), row.names=1)
 
-df_18s <- read.csv(file=here("data", "Merged2018_18S_otu_filtered.csv"), row.names=1)
+df_16s <- exampleData("Merged2018_16S_otu_filtered.csv")
+df_18s <- exampleData("Merged2018_18S_otu_filtered.csv")
 ```
 
 #### Generate beta distribution parameters
 ```{r betaparams}
-# This step produces arrays containing sample information, including a) read counts + 1 and b) total read counts for each sample. We need both of these pieces of data to calculate the beta distributions.
+# This step produces arrays containing arrays of the two parameters of a beta distribution derived from the supplied read counts and the total number of reads for each sample.
 
 beta.16s.merged <- betaParams(df_16s)
 beta.18s.merged <- betaParams(df_18s)
@@ -38,15 +40,15 @@ beta.18s.merged <- betaParams(df_18s)
 beta.16s.merged[1,1,]
 beta.18s.merged[1,1,]
 ```
+
 #### Run MAMBO 
-```{r data, include=FALSE}
-mambo('18s', beta.18s.merged, '16s', beta.16s.merged)
+```{r mambo, include=FALSE}
+result <- mambo('18s', beta.18s.merged, '16s', beta.16s.merged)
 ```
 
 #### Import RDS file which as a summary of the model results
-# Can we generate a variable for the rds file name that we can call here instead of copying and pasting from the directory?
 ```{r rds}
-rds <- readRDS("mambo.20231204_144433.rds")
+rds <- readRDS(result$filename)
 
 # Take a look at the labels, which will include predictor and response variables, each of which represent a different marker gene ("locus")
 rds$labels
@@ -60,6 +62,7 @@ plotPCs(rds, '16s')
 ```{r PCA}
 plotPCs(rds, '18s')
 ```
+
 #### Check which ASVs are outliers, ie driving the separations
 ```{r outliers}
 outliers.16s <- outlierLoadings(rds, '16s', 1)

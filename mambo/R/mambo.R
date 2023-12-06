@@ -102,7 +102,7 @@ mambo <- function(
   end.time = Sys.time()
 
   res <- list(
-    file = paste0(run.label, '.', format(Sys.time(), '%Y%m%d_%H%M%S.rds')),
+    filename = paste0(run.label, '.', format(Sys.time(), '%Y%m%d_%H%M%S.rds')),
     labels = c(run = run.label, resp = resp.label, pred = pred.label),
     params = c(
       nrep = nrep, chains = chains, adapt = adapt,
@@ -115,7 +115,7 @@ mambo <- function(
       elapsed = difftime(end.time, start.time)
     )
   )
-  saveRDS(res, file)
+  saveRDS(res, filename)
 
   message('\n-------------')
   message(format(Sys.time()), ' : End replicates')
