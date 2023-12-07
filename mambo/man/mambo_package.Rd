@@ -3,8 +3,12 @@
 \docType{package}
 \name{mambo_package}
 \alias{mambo_package}
+\alias{mamboTutorial}
 \alias{mambo-package}
 \title{\code{mambo} package}
+\usage{
+mamboTutorial()
+}
 \description{
 Metabarcoding Analysis using Modeled Bayesian Occurrences
 }

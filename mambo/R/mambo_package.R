@@ -7,7 +7,19 @@
 #' @name mambo_package
 #'
 #' @keywords package
-NULL
+#' 
+#' @export
+#' 
+mamboTutorial <- function() {
+  utils::browseURL(system.file("mambo_Tutorial.html", package = "mambo"))
+}
+
+.onAttach <- function(libname, pkgname) {
+  packageStartupMessage(
+    "Welcome to mambo v", utils::packageVersion("mambo"), "\n",
+    "See mamboTutorial() for a guide to the package."
+  )
+}
 
 #' @docType data
 #' @name fl16s

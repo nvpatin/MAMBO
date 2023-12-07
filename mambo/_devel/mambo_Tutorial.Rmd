@@ -1,0 +1,87 @@
+---
+title: "MAMBO Tutorial"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is a tutorial for running metabarcoding data sets through MAMBO (Metabarcoding Analysis of Modeled Bayesian Occurrences). You should start with two ASV tables, each of which has columns as samples and rows as ASVs, with the first column listing each unique ASV.
+
+```{r libraries}
+library(mambo)
+library(tidyverse)
+library(here)
+```
+
+#### Import your ASV tables 
+```{r data}
+# df_16s <- read.csv(file=here("data", "Merged2018_16S_otu_filtered.csv"), row.names=1)
+# df_18s <- read.csv(file=here("data", "Merged2018_18S_otu_filtered.csv"), row.names=1)
+
+df_16s <- exampleData("Merged2018_16S_otu_filtered.csv")
+df_18s <- exampleData("Merged2018_18S_otu_filtered.csv")
+```
+
+#### Generate beta distribution parameters
+```{r betaparams}
+# This step produces arrays containing arrays of the two parameters of a beta distribution derived from the supplied read counts and the total number of reads for each sample.
+
+beta.16s.merged <- betaParams(df_16s)
+beta.18s.merged <- betaParams(df_18s)
+```
+#### Check the parameters
+```{r check}
+# Check the read count and sample total read count for one element
+beta.16s.merged[1,1,]
+beta.18s.merged[1,1,]
+```
+
+#### Run MAMBO 
+```{r mambo, include=FALSE}
+result <- mambo('18s', beta.18s.merged, '16s', beta.16s.merged, nrep = 5, chains = 10)
+```
+
+#### Import RDS file which has the model results
+```{r rds}
+rds <- readRDS(result$filename)
+
+# Take a look at the labels, which will include predictor and response variables, each of which represent a different marker gene ("locus")
+rds$labels
+```
+
+### Plot the PCAs for each marker gene ("locus")
+```{r PCA_16S}
+plotPCs(rds, '16s')
+```
+
+```{r PCA_18S}
+plotPCs(rds, '18s')
+```
+
+#### Check which ASVs are outliers, ie driving the separations
+```{r outliers_16S}
+outliers.16s <- outlierLoadings(rds, '16s', 1)
+```
+
+```{r outliers_18S}
+outliers.18s <- outlierLoadings(rds, '18s', 1)
+```
+
+#### Import the taxonomy file and identify taxonomy of outlier ASVs
+```{r tax}
+tax_16s <- exampleData("Merged2018_16S_taxa_filtered.csv")
+tax_18s <- exampleData("Merged2018_18S_taxa_filtered.csv")
+
+# Add column name to match ASV tibble column name if it doesn't already
+colnames(tax_16s)[1] <- "asv"
+colnames(tax_18s)[1] <- "asv"
+
+# Merge the tibbles
+asvs_out_16s_tax <- left_join(outliers.16s, tax_16s, by = "asv")
+asvs_out_18s_tax <- left_join(outliers.18s, tax_18s, by = "asv")
+```
+

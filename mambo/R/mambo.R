@@ -115,7 +115,7 @@ mambo <- function(
       elapsed = difftime(end.time, start.time)
     )
   )
-  saveRDS(res, filename)
+  saveRDS(res, res$filename)
 
   message('\n-------------')
   message(format(Sys.time()), ' : End replicates')
@@ -130,6 +130,8 @@ mambo <- function(
     'Total elapsed time: ', format(round(swfscMisc::autoUnits(res$run.time$elapsed), 2)),
     ' (', format(round(swfscMisc::autoUnits(res$run.time$elapsed / nrep), 2)), ' per replicate)'
   )
+  message('\n')
+  message('File saved to: ', res$filename)
   message('-------------\n')
 
   if(output.log) {

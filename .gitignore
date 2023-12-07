@@ -7,4 +7,5 @@
 bayesian_results/*
 .DS_Store
 .idea/*
-AccessoryScripts/erics_sandbox/*.rds
+*.log
+*.rds
