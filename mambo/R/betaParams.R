@@ -14,6 +14,7 @@
 betaParams <- function(x) {
   # read data if filename is given
   if(is.character(x)) x <- utils::read.delim(x, row.names = 1)
+  x <- as.matrix(x)
 
   if(length(rownames(x)) == 0) stop('count tables need ASV names for the rows')
   if(length(colnames(x)) == 0) stop('count tables need sample names for the columns')

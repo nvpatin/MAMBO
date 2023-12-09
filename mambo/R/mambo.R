@@ -53,6 +53,7 @@ mambo <- function(
   resp.beta <- betaParams(resp.counts)
   pred.beta <- betaParams(pred.counts)
   
+  # check that the same sample names are in both datasets
   if(!setequal(
     sort(dimnames(resp.beta)[[1]]), 
     sort(dimnames(pred.beta)[[1]])
