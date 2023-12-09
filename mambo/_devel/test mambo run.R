@@ -9,4 +9,3 @@ result <- mambo(
   nrep = 5, 
   chains = 10
 )
-

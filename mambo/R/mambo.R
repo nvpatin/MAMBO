@@ -49,19 +49,24 @@ mambo <- function(
     run.label = 'mambo',
     output.log = TRUE
 ) {
+  # compute beta parameter arrays
+  resp.beta <- betaParams(resp.counts)
+  pred.beta <- betaParams(pred.counts)
+  
+  if(!setequal(
+    sort(dimnames(resp.beta)[[1]]), 
+    sort(dimnames(pred.beta)[[1]])
+  )) stop("sample names in 'resp.counts' and 'pred.counts' are not the same.")
+  
+  # make sure rows are in same order for both sets of data
+  resp.beta <- resp.beta[dimnames(pred.beta)[[1]], , ]
+  
   if(output.log) {
     log.file <- file(format(Sys.time(), 'mambo.%Y%m%d_%H%M%S.log'), open = 'a')
     sink(file = log.file, type = 'output', split = TRUE)
     sink(file = log.file, type = 'message')
   }
-
-  # compute beta parameter arrays
-  resp.beta <- betaParams(resp.counts)
-  pred.beta <- betaParams(pred.counts)
   
-  # make sure rows are in same order for both sets of data
-  resp.beta <- resp.beta[dimnames(pred.beta)[[1]], , ]
-
   # do nrep iterations, save results to list, and write to RDS file
   start.time <- Sys.time()
   reps <- lapply(1:nrep, function(i) {
