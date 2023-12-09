@@ -19,15 +19,6 @@ a three dimensional array where the first dimension are the samples,
 \description{
 Fits shape paraemters of beta distribution to ASV occurrence data.
 }
-\examples{
-# use built-in 16S data
-beta.16s <- betaParams(fl16s)
-str(beta.16s)
-
-# both shape parameters for first 5 samples and first 3 ASVs
-beta.16s[1:5, 1:3, ]
-
-}
 \author{
 Eric Archer \email{eric.archer@noaa.gov}
 }

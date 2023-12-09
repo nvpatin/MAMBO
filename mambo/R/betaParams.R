@@ -11,32 +11,20 @@
 #'
 #' @author Eric Archer \email{eric.archer@@noaa.gov}
 #'
-#' @examples
-#' # use built-in 16S data
-#' beta.16s <- betaParams(fl16s)
-#' str(beta.16s)
-#' 
-#' # both shape parameters for first 5 samples and first 3 ASVs
-#' beta.16s[1:5, 1:3, ]
-#'
-#' @export
-#'
 betaParams <- function(x) {
   # read data if filename is given
-  if(is.character(x)) {
-    x <- utils::read.delim(x, row.names = 1)
-  }
+  if(is.character(x)) x <- utils::read.delim(x, row.names = 1)
 
+  if(length(rownames(x)) == 0) stop('count tables need ASV names for the rows')
+  if(length(colnames(x)) == 0) stop('count tables need sample names for the columns')
+  
   # by-sample (columns) coverage
   coverage <- colSums(x)
 
   # fit beta shape parameters (transpose matrix for recycling of coverage vector)
   tx <- t(x)
   result <- array(c(tx + 1, coverage - tx + 1), dim = c(dim(tx), 2))
-  dimnames(result) <- list(
-    colnames(x),
-    rownames(x),
-    c('shape1', 'shape2')
-  )
+  dimnames(result) <- list(colnames(x), rownames(x), c('shape1', 'shape2'))
+  
   result
 }

@@ -22,20 +22,40 @@ mamboTutorial <- function() {
 }
 
 #' @docType data
-#' @name fl16s
-#' @title Flyer 16S Read Counts
+#' @name counts.16s
+#' @title 16S ASV Read Counts
 #' @description << add a description >>
-#' @usage data(fl16s)
+#' @usage data(counts.16s)
 #' @format data.frame
 #' @references << add a reference >>
 #' @keywords datasets
 NULL
 
 #' @docType data
-#' @name fl18s
-#' @title Flyer 18S Read Counts
+#' @name counts.18s
+#' @title 18S ASV Read Counts
 #' @description << add a description >>
-#' @usage data(fl18s)
+#' @usage data(counts.18s)
+#' @format data.frame
+#' @references << add a reference >>
+#' @keywords datasets
+NULL
+
+#' @docType data
+#' @name taxa.16s
+#' @title 16S ASV Taxonomy
+#' @description << add a description >>
+#' @usage data(taxa.16s)
+#' @format data.frame
+#' @references << add a reference >>
+#' @keywords datasets
+NULL
+
+#' @docType data
+#' @name taxa.18s
+#' @title 18S ASV Taxonomy
+#' @description << add a description >>
+#' @usage data(taxa.18s)
 #' @format data.frame
 #' @references << add a reference >>
 #' @keywords datasets

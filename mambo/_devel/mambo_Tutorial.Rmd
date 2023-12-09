@@ -7,81 +7,105 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
-
-This is a tutorial for running metabarcoding data sets through MAMBO (Metabarcoding Analysis of Modeled Bayesian Occurrences). You should start with two ASV tables, each of which has columns as samples and rows as ASVs, with the first column listing each unique ASV.
+This is a tutorial for running metabarcoding data sets through MAMBO (Metabarcoding Analysis of Modeled Bayesian Occurrences). You should start with two ASV tables, each of which has columns as samples and rows as ASVs.
 
 ```{r libraries}
 library(mambo)
-library(tidyverse)
-library(here)
 ```
 
-#### Import your ASV tables 
-```{r data}
-# df_16s <- read.csv(file=here("data", "Merged2018_16S_otu_filtered.csv"), row.names=1)
-# df_18s <- read.csv(file=here("data", "Merged2018_18S_otu_filtered.csv"), row.names=1)
+## ASV Tables
 
-df_16s <- exampleData("Merged2018_16S_otu_filtered.csv")
-df_18s <- exampleData("Merged2018_18S_otu_filtered.csv")
+ASV count tables should be loaded as R data frames or matrices. The values in the tables represent the occurrence (number of reads) fore each ASV (rows) in each sample (columns). The table should have both row and column names uniquely identifying ASVs and samples.
+
+We supply two example ASV count tables in **mambo**: '**counts.16s**' and '**counts.18s**'.
+```{r data}
+counts.16s[1:5, 1:5]
 ```
 
 #### Generate beta distribution parameters
 ```{r betaparams}
-# This step produces arrays containing arrays of the two parameters of a beta distribution derived from the supplied read counts and the total number of reads for each sample.
+# This step produces three dimensional arrays containing the two parameters of a beta distribution derived from the ASV read counts and the total number of reads for each sample. The first dimension gives the samples. The second dimension gives the ASVs. The third dimension are the two beta parameters.
 
-beta.16s.merged <- betaParams(df_16s)
-beta.18s.merged <- betaParams(df_18s)
-```
-#### Check the parameters
-```{r check}
-# Check the read count and sample total read count for one element
-beta.16s.merged[1,1,]
-beta.18s.merged[1,1,]
+# beta.16s <- betaParams(counts.16s)
+# beta.18s <- betaParams(counts.18s)
+# 
+# beta.16s[1:5, 1:5]
 ```
 
-#### Run MAMBO 
+## Run MAMBO 
+
+To run the main function, **mambo()**, we need to supply labels for the response and predictor datasets and the response and predictor count tables, along with the number of replicates (**nrep**) and other MCMC parameters (see **?mambo**).  
 ```{r mambo, include=FALSE}
-result <- mambo('18s', beta.18s.merged, '16s', beta.16s.merged, nrep = 5, chains = 10)
+result <- mambo(
+  resp.label = '18s', 
+  resp.counts = counts.18s, 
+  pred.label = '16s', 
+  pred.counts = counts.16s, 
+  nrep = 5, 
+  chains = 10
+)
 ```
 
-#### Import RDS file which has the model results
+## Examine Results
+
+The return value of the **mambo()** function is list, containing several elements.  
+
+The filename of the .RDS file that was written. This file contains the mambo output list: 
 ```{r rds}
-rds <- readRDS(result$filename)
-
-# Take a look at the labels, which will include predictor and response variables, each of which represent a different marker gene ("locus")
-rds$labels
+result$filename
 ```
 
-### Plot the PCAs for each marker gene ("locus")
+The labels that were provided to the function for each locus:
+```{r}
+result$labels
+```
+
+The MCMC parameters:
+```{r}
+result$params
+```
+
+A list of the results for every replicate.  Each element in this list contains the PCA results for both loci ($pca)
+```{r}
+str(result$reps[[1]]$pca[[1]])
+```
+
+...and a matrix with summaries of the posteriors of the Bayesian linear model:
+```{r}
+str(result$reps[[1]]$post.smry)
+```
+
+...and a list of the actual posterior sample from the Bayesian linear model:
+```{r}
+str(result$reps[[1]]$post.list)
+```
+
+## Plot the PCAs for each marker gene ("locus")
 ```{r PCA_16S}
-plotPCs(rds, '16s')
+plotPCs(result, '16s')
 ```
 
 ```{r PCA_18S}
-plotPCs(rds, '18s')
+plotPCs(result, '18s')
 ```
 
-#### Check which ASVs are outliers, ie driving the separations
-```{r outliers_16S}
-outliers.16s <- outlierLoadings(rds, '16s', 1)
+## Check which ASVs are outliers, ie driving the separations
+```{r outliers}
+outliers.16s <- outlierLoadings(result, locus = '16s', pc = 1)
+outliers.18s <- outlierLoadings(result, locus = '18s', pc = 1)
+
+str(outliers.16s)
 ```
 
-```{r outliers_18S}
-outliers.18s <- outlierLoadings(rds, '18s', 1)
-```
-
-#### Import the taxonomy file and identify taxonomy of outlier ASVs
-```{r tax}
-tax_16s <- exampleData("Merged2018_16S_taxa_filtered.csv")
-tax_18s <- exampleData("Merged2018_18S_taxa_filtered.csv")
-
+### Identify taxonomy of outlier ASVs
+```{r taxa}
 # Add column name to match ASV tibble column name if it doesn't already
-colnames(tax_16s)[1] <- "asv"
-colnames(tax_18s)[1] <- "asv"
+taxa.16s$asv <- taxa.18s$asv <- "asv"
 
 # Merge the tibbles
-asvs_out_16s_tax <- left_join(outliers.16s, tax_16s, by = "asv")
-asvs_out_18s_tax <- left_join(outliers.18s, tax_18s, by = "asv")
+asvs_out_16s_tax <- dplyr::left_join(outliers.16s, taxa.16s, by = "asv")
+asvs_out_18s_tax <- dplyr::left_join(outliers.18s, taxa.18s, by = "asv")
+
+str(asvs_out_16s_tax)
 ```
 

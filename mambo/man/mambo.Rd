@@ -6,9 +6,9 @@
 \usage{
 mambo(
   resp.label,
-  resp.beta,
+  resp.counts,
   pred.label,
-  pred.beta,
+  pred.counts,
   nrep = 10,
   chains = 3,
   adapt = 100,
@@ -20,13 +20,13 @@ mambo(
 )
 }
 \arguments{
-\item{resp.label}{label for response data.}
+\item{resp.label}{label for response locus.}
 
-\item{resp.beta}{matrix of response beta parameters from \link{betaParams}.}
+\item{resp.counts}{ASV counts of response locus.}
 
-\item{pred.label}{label for predictor data.}
+\item{pred.label}{label for predictor locus.}
 
-\item{pred.beta}{matrix of predictor beta parameters from \link{betaParams}.}
+\item{pred.counts}{ASV counts of predictor locus.}
 
 \item{nrep}{number of MAMBO replicates to run.}
 
@@ -47,6 +47,7 @@ mambo(
 \value{
 a list containing:
 \describe{ 
+  \item{\code{$filename}}{the name of the RDS file written.}
   \item{\code{$labels}}{the run, response and predictor labels.} 
   \item{\code{$params}}{the MCMC run parameters.}
   \item{\code{$reps}}{a list with results for each of \code{nrep} replicate runs.}
@@ -61,6 +62,11 @@ Each replicate in the \code{$reps} element contains:
 }
 \description{
 Run MAMBO replicates
+}
+\note{
+\code{resp.counts} and \code{pred.counts} should be matrices, 
+data frames, or names of comma-delimited (.csv) files where values are the 
+occurence (number of reads) for each ASV (rows) in each sample (columns).
 }
 \author{
 Eric Archer \email{eric.archer@noaa.gov}

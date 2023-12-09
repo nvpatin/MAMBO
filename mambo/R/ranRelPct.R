@@ -8,16 +8,6 @@
 #'
 #' @author Eric Archer \email{eric.archer@@noaa.gov}
 #' 
-#' @examples
-#' # use built-in 16S data
-#' beta.16s <- betaParams(fl16s)
-#' str(beta.16s)
-#' 
-#' rel.pct <- ranRelPct(beta.16s)
-#' rel.pct[1:5, 1:3]
-#'
-#' @export
-#'
 ranRelPct <- function(beta.params) {
   # draw random sample from beta distribution with shape parameters 'p'
   pct <- apply(beta.params, c(1, 2), function(p) stats::rbeta(1, p[1], p[2]))

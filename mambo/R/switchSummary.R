@@ -37,12 +37,12 @@ switchSummary <- function(results, min.p = 0.75, plot = TRUE) {
 
   smry <- w.post |>
     dplyr::group_by(resp, pred) |>
-    dplyr::summarize(median = stats::median(w), .groups = 'drop') |>
-    dplyr::filter(median > min.p)
+    dplyr::summarize(median.w = stats::median(w), .groups = 'drop') |>
+    dplyr::filter(median.w > min.p)
 
   p <- w.post |>
     dplyr::left_join(smry, by = c('resp', 'pred')) |>
-    dplyr::mutate(to.highlight = !is.na(median)) |>
+    dplyr::mutate(to.highlight = !is.na(median.w)) |>
     ggplot2::ggplot() +
     ggplot2::geom_histogram(ggplot2::aes(w, fill = to.highlight)) +
     ggplot2::scale_fill_manual(values = c('black', 'red')) +

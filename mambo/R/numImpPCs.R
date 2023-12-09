@@ -8,26 +8,6 @@
 #'
 #' @author Eric Archer \email{eric.archer@@noaa.gov}
 #'
-#' @examples
-#' # use built-in 16S data
-#' beta.16s <- betaParams(fl16s)
-#' pca.16s <- ranPCA(beta.16s)
-#' 
-#' i <- numImpPCs(pca.16s)
-#' 
-#' # Number of variables
-#' ncol(pca.16s$importance)
-#' 
-#' # Expected proportion of variance
-#' 1 / ncol(pca.16s$importance)
-#' 
-#' # Number of important components
-#' i
-#' 
-#' pca.16s$importance[, 1:i]
-#'
-#' @export
-#'
 numImpPCs <- function(pca) {
   # number of important PCs = as many as account for expected variance
   imp.gt.exp <- pca$importance["Proportion of Variance", ] >= (1 / ncol(pca$importance))

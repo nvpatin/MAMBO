@@ -14,8 +14,6 @@
 #'s
 #' @author Eric Archer \email{eric.archer@@noaa.gov}
 #'
-#' @export
-#'
 jagsPClm <- function(pc.resp, pc.preds, chains, adapt, burnin, total.samples, thin) {
   data.list <- list(
     num.ind = nrow(pc.resp),

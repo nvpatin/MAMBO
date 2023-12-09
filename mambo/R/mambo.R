@@ -1,10 +1,10 @@
 #' @title Run MAMBO replicates
 #' @description Run MAMBO replicates
 #'
-#' @param resp.label label for response data.
-#' @param resp.beta matrix of response beta parameters from \link{betaParams}.
-#' @param pred.label label for predictor data.
-#' @param pred.beta matrix of predictor beta parameters from \link{betaParams}.
+#' @param resp.label label for response locus.
+#' @param resp.counts ASV counts of response locus.
+#' @param pred.label label for predictor locus.
+#' @param pred.counts ASV counts of predictor locus.
 #' @param nrep number of MAMBO replicates to run.
 #' @param chains number of MCMC chains.
 #' @param adapt number of adaptation iterations.
@@ -14,8 +14,13 @@
 #' @param run.label label for the run output.
 #' @param output.log create a text log of the run progress?
 #'
+#' @note \code{resp.counts} and \code{pred.counts} should be matrices, 
+#' data frames, or names of comma-delimited (.csv) files where values are the 
+#' occurence (number of reads) for each ASV (rows) in each sample (columns).
+#' 
 #' @return a list containing:
 #' \describe{ 
+#'   \item{\code{$filename}}{the name of the RDS file written.}
 #'   \item{\code{$labels}}{the run, response and predictor labels.} 
 #'   \item{\code{$params}}{the MCMC run parameters.}
 #'   \item{\code{$reps}}{a list with results for each of \code{nrep} replicate runs.}
@@ -33,7 +38,8 @@
 #' @export
 #'
 mambo <- function(
-    resp.label, resp.beta, pred.label, pred.beta,
+    resp.label, resp.counts, 
+    pred.label, pred.counts,
     nrep = 10,
     chains = 3,
     adapt = 100,
@@ -49,6 +55,13 @@ mambo <- function(
     sink(file = log.file, type = 'message')
   }
 
+  # compute beta parameter arrays
+  resp.beta <- betaParams(resp.counts)
+  pred.beta <- betaParams(pred.counts)
+  
+  print(str(resp.beta))
+  print(str(pred.beta))
+  
   # make sure rows are in same order for both sets of data
   resp.beta <- resp.beta[dimnames(pred.beta)[[1]], , ]
 

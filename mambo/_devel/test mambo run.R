@@ -1,10 +1,12 @@
 rm(list = ls())
 library(mambo)
 
-mambo(
-  resp.label = '18s',
-  resp.beta = betaParams(fl18s),
-  pred.label = '16s',
-  pred.beta = betaParams(fl16s),
-  nrep = 10
+result <- mambo(
+  resp.label = '18s', 
+  resp.counts = counts.18s, 
+  pred.label = '16s', 
+  pred.counts = counts.16s, 
+  nrep = 5, 
+  chains = 10
 )
+

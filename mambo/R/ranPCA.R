@@ -8,19 +8,6 @@
 #' @return summary of PCA from \link{summary.prcomp}.
 #'
 #' @author Eric Archer \email{eric.archer@@noaa.gov}
-#' 
-#' @examples
-#' # use built-in 16S data
-#' beta.16s <- betaParams(fl16s)
-#' str(beta.16s)
-#' 
-#' pca.16s.1 <- ranPCA(beta.16s)
-#' pca.16s.1$importance[, 1:2]
-#' 
-#' pca.16s.2 <- ranPCA(beta.16s)
-#' pca.16s.2$importance[, 1:2]
-#'
-#' @export
 #'
 ranPCA <- function(beta.params) {
   prob <- t(ranRelPct(beta.params))
