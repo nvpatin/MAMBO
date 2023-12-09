@@ -59,9 +59,6 @@ mambo <- function(
   resp.beta <- betaParams(resp.counts)
   pred.beta <- betaParams(pred.counts)
   
-  print(str(resp.beta))
-  print(str(pred.beta))
-  
   # make sure rows are in same order for both sets of data
   resp.beta <- resp.beta[dimnames(pred.beta)[[1]], , ]
 
