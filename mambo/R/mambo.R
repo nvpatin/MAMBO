@@ -124,12 +124,12 @@ mambo <- function(
       nrep = nrep, chains = chains, adapt = adapt,
       burnin = burnin, total.samples = total.samples, thin = thin
     ),
-    reps = reps,
     run.time = list(
       start = start.time,
       end = end.time,
       elapsed = difftime(end.time, start.time)
-    )
+    ),
+    reps = reps
   )
   saveRDS(res, res$filename)
 

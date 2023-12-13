@@ -19,17 +19,7 @@ ASV count tables should be loaded as R data frames or matrices. The values in th
 
 We supply two example ASV count tables in **mambo**: '**counts.16s**' and '**counts.18s**'.
 ```{r data}
-counts.16s[1:5, 1:5]
-```
-
-#### Generate beta distribution parameters
-```{r betaparams}
-# This step produces three dimensional arrays containing the two parameters of a beta distribution derived from the ASV read counts and the total number of reads for each sample. The first dimension gives the samples. The second dimension gives the ASVs. The third dimension are the two beta parameters.
-
-# beta.16s <- betaParams(counts.16s)
-# beta.18s <- betaParams(counts.18s)
-# 
-# beta.16s[1:5, 1:5]
+counts.16s[1:8, 1:4]
 ```
 
 ## Run MAMBO 
@@ -48,24 +38,29 @@ result <- mambo(
 
 ## Examine Results
 
-The return value of the **mambo()** function is list, containing several elements.  
+The return value of the **mambo()** function is list, containing five elements:   
 
-The filename of the .RDS file that was written. This file contains the mambo output list: 
+1) The filename of the .RDS file that was written that contains this **mambo()** output list:  
 ```{r rds}
 result$filename
 ```
 
-The labels that were provided to the function for each locus:
+2) The labels that were provided to the function for each locus:
 ```{r}
 result$labels
 ```
 
-The MCMC parameters:
+3) The MCMC parameters:
 ```{r}
 result$params
 ```
 
-A list of the results for every replicate.  Each element in this list contains the PCA results for both loci ($pca)
+4) The run times for the model:
+```{r}
+result$run.time
+```
+
+5) A list of the results for every replicate.  Each element in this list contains the PCA results for both loci ($pca)
 ```{r}
 str(result$reps[[1]]$pca[[1]])
 ```
@@ -90,22 +85,27 @@ plotPCs(result, '18s')
 ```
 
 ## Check which ASVs are outliers, ie driving the separations
-```{r outliers}
-outliers.16s <- outlierLoadings(result, locus = '16s', pc = 1)
-outliers.18s <- outlierLoadings(result, locus = '18s', pc = 1)
+```{r outliers_16S}
+outliers.16s.pc1 <- outlierLoadings(result, locus = '16s', pc = 1)
+outliers.18s.pc1 <- outlierLoadings(result, locus = '18s', pc = 1)
 
-str(outliers.16s)
+head(outliers.16s.pc1)
+```
+
+```{r outliers_18S}
+head(outliers.18s.pc1)
 ```
 
 ### Identify taxonomy of outlier ASVs
 ```{r taxa}
 # Add column name to match ASV tibble column name if it doesn't already
-taxa.16s$asv <- taxa.18s$asv <- "asv"
+taxa.16s$asv <- rownames(taxa.16s)
+taxa.18s$asv <- rownames(taxa.18s)
 
 # Merge the tibbles
-asvs_out_16s_tax <- dplyr::left_join(outliers.16s, taxa.16s, by = "asv")
-asvs_out_18s_tax <- dplyr::left_join(outliers.18s, taxa.18s, by = "asv")
+asvs_out_16s_tax <- dplyr::left_join(outliers.16s.pc1, taxa.16s, by = "asv")
+asvs_out_18s_tax <- dplyr::left_join(outliers.18s.pc1, taxa.18s, by = "asv")
 
-str(asvs_out_16s_tax)
+head(asvs_out_16s_tax)
 ```
 
