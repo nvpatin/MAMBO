@@ -1,7 +1,7 @@
-#' @title Principal component analysis of random draw from beta distributon
+#' @title Principal component analysis of random draw from beta distribution
 #' @description Conducts a random draw of relative percent occurrence from 
 #'   beta distribution. Then does a PCA of the log-odds of the relative percent
-#'   occurence.
+#'   occurrence.
 #'
 #' @param beta.params matrix of beta parameters from \link{betaParams}.
 #'
