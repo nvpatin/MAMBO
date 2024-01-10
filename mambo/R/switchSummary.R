@@ -11,7 +11,7 @@
 #'
 #' @export
 #'
-switchSummary <- function(results, min.p = 0.75, plot = TRUE) {
+switchSummary <- function(results, min.p = 0.9, plot = TRUE) {
   resp <- results$labels['resp']
   pred <- results$labels['pred']
 
