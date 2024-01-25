@@ -4,7 +4,7 @@
 \alias{switchSummary}
 \title{Summary of bayesian switches}
 \usage{
-switchSummary(results, min.p = 0.75, plot = TRUE)
+switchSummary(results, min.p = 0.9, plot = TRUE)
 }
 \arguments{
 \item{results}{output of a \code{mambo} run.}

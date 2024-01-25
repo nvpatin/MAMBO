@@ -2,7 +2,7 @@
 % Please edit documentation in R/ranPCA.R
 \name{ranPCA}
 \alias{ranPCA}
-\title{Principal component analysis of random draw from beta distributon}
+\title{Principal component analysis of random draw from beta distribution}
 \usage{
 ranPCA(beta.params)
 }
@@ -15,7 +15,7 @@ summary of PCA from \link{summary.prcomp}.
 \description{
 Conducts a random draw of relative percent occurrence from 
   beta distribution. Then does a PCA of the log-odds of the relative percent
-  occurence.
+  occurrence.
 }
 \author{
 Eric Archer \email{eric.archer@noaa.gov}

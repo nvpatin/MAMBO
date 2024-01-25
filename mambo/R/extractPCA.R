@@ -36,10 +36,14 @@ extractPCA <- function(results) {
       )
   })
   
-  scores <- lapply(pca.list, function(x) {
-    res <- abind::abind(x$x, along = 3) |> 
+  scores <- lapply(pca.list, function(rep) {
+    res <- abind::abind(rep$x, along = 3) |> 
       apply(2, function(x) {
-        to.switch <- sign(x[1, ]) != sign(x[1, 1])
+        # use sample (row) with largest absolute score on first replicate (column) as reference for sign
+        ref.index <- which.max(abs(x[, 1]))
+        # identify replicates (columns) that have a different sign from reference
+        to.switch <- sign(x[ref.index, ]) != sign(x[ref.index, 1])
+        # switch sign of replicates that need it
         x[, to.switch] <- x[, to.switch] * -1
         x
       }, simplify = FALSE) |> 
