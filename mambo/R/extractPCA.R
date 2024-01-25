@@ -13,10 +13,14 @@
 extractPCA <- function(results) {
   pca.list <- pcaList(results)
   
-  loadings <- lapply(pca.list, function(x) {
-    res <- abind::abind(x$rotation, along = 3) |> 
+  loadings <- lapply(pca.list, function(rep) {
+    res <- abind::abind(rep$rotation, along = 3) |> 
       apply(2, function(x) {
-        to.switch <- sign(x[1, ]) != sign(x[1, 1])
+        # use ASV (row) with largest absolute loading on first replicate (column) as reference for sign
+        ref.index <- which.max(abs(x[, 1]))
+        # identify replicates (columns) that have a different sign from reference
+        to.switch <- sign(x[ref.index, ]) != sign(x[ref.index, 1])
+        # switch sign of replicates that need it
         x[, to.switch] <- x[, to.switch] * -1
         x
       }, simplify = FALSE) |> 
