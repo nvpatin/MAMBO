@@ -13,5 +13,6 @@ ranPCA <- function(beta.params) {
   prob <- t(ranRelPct(beta.params))
   log(prob / (1 - prob)) |>
     stats::prcomp() |>
-    summary()
+    summary() |> 
+    suppressWarnings()
 }

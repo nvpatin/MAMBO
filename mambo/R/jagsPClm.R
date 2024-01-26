@@ -63,6 +63,7 @@ jagsPClm <- function(pc.resp, pc.preds, chains, adapt, burnin, total.samples, th
     modules = c("glm", "lecuyer"),
     summarise = FALSE,
     method = "parallel",
+    silent.jags = TRUE,
     n.chains = chains,
     adapt = adapt,
     burnin = burnin,

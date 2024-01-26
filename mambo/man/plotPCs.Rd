@@ -4,7 +4,7 @@
 \alias{plotPCs}
 \title{Plot principal component confidence ellipses}
 \usage{
-plotPCs(results, locus, pc.x = 1, pc.y = 2, ellipse.p = 0.95)
+plotPCs(results, locus, pc.x = 1, pc.y = 2, ellipse.p = 0.95, plot = TRUE)
 }
 \arguments{
 \item{results}{output of a \code{mambo} run.}
@@ -16,6 +16,8 @@ plotPCs(results, locus, pc.x = 1, pc.y = 2, ellipse.p = 0.95)
 \item{pc.y}{number of y-axis principal component.}
 
 \item{ellipse.p}{probability density level of ellipse.}
+
+\item{plot}{display plot?}
 }
 \value{
 PCA biplot of scores with confidence ellipses for each sample.

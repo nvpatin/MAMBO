@@ -1,0 +1,352 @@
+# Try running mambo
+# KP 01/24/24
+
+```{r}
+library(devtools)
+```
+
+```{r}
+load_all("/Users/kpitz/github/nvpatin/MAMBO/mambo")
+
+```
+
+# from vignette
+```{r libraries}
+# library(mambo)
+library(tidyverse)
+```
+
+#### Import your ASV tables
+```{r}
+# use data here:
+# "/Users/kpitz/github/nvpatin/MAMBO/Data/merged_data/no_duplicates/"
+
+df_16s <- read.csv("/Users/kpitz/github/nvpatin/MAMBO/Data/merged_data/no_duplicates/Merged2018_16S_otu_filtered.csv", row.names=1)
+
+df_18s <- read.csv("/Users/kpitz/github/nvpatin/MAMBO/Data/merged_data/no_duplicates/Merged2018_18S_otu_filtered.csv", row.names=1)
+```
+
+#### Run MAMBO 
+
+mambo <- function(
+    resp.label, resp.counts, 
+    pred.label, pred.counts,
+    nrep = 10,
+    chains = 3,
+    adapt = 100,
+    burnin = 1000,
+    total.samples = 1000,
+    thin = 1,
+    run.label = 'mambo',
+    output.log = TRUE
+)
+
+```{r}
+test_Results <- mambo('18S', df_18s, '16S', df_16s)
+```
+
+```{r}
+#test_Results2 <- mambo('16S', df_16s, '18S', df_18s)
+```
+
+## Plot Results
+
+
+```{r}
+plotPCs(test_Results, '16S')
+```
+```{r}
+plotPCs(test_Results, '18S')
+```
+
+
+
+# Try out individual PCA:
+### Functions
+ranPCA <- function(beta.params) {
+  prob <- t(ranRelPct(beta.params))
+  log(prob / (1 - prob)) |>
+    stats::prcomp() |>
+    summary()
+}
+ranRelPct <- function(beta.params) {
+  # draw random sample from beta distribution with shape parameters 'p'
+  pct <- apply(beta.params, c(1, 2), function(p) stats::rbeta(1, p[1], p[2]))
+
+  # normalize random percents to unity and return matrix
+  # (transposed back to original dimensions)
+  pct <- t(pct / rowSums(pct))
+  rownames(pct) <- dimnames(beta.params)[[2]]
+  colnames(pct) <- dimnames(beta.params)[[1]]
+  pct
+}
+betaParams <- function(x) {
+  # read data if filename is given
+  if(is.character(x)) x <- utils::read.delim(x, row.names = 1)
+  x <- as.matrix(x)
+
+  if(length(rownames(x)) == 0) stop('count tables need ASV names for the rows')
+  if(length(colnames(x)) == 0) stop('count tables need sample names for the columns')
+  
+  # by-sample (columns) coverage
+  coverage <- colSums(x)
+
+  # fit beta shape parameters (transpose matrix for recycling of coverage vector)
+  tx <- t(x)
+  result <- array(c(tx + 1, coverage - tx + 1), dim = c(dim(tx), 2))
+  dimnames(result) <- list(colnames(x), rownames(x), c('shape1', 'shape2'))
+  
+  result
+}
+```{r}
+# Try out single PC for 16S
+test_betaParams <- betaParams(df_16s)
+test_ranPCR <-  ranPCA(test_betaParams)
+test_ranRelPct <- ranRelPct(test_betaParams)
+```
+
+```{r}
+# Plot
+df <- as_tibble(test_ranPCR$x, rownames = "sampleID")
+df %>%
+  ggplot(aes(x=PC1, y=PC2)) +
+  geom_point()
+# df %>%
+#   ggplot(aes(x=PC2, y=PC3)) +
+#   geom_point()
+```
+
+```{r}
+# Try out single PC for 18S
+test_betaParams <- betaParams(df_18s)
+test_ranPCR <-  ranPCA(test_betaParams)
+test_ranRelPct <- ranRelPct(test_betaParams)
+```
+
+```{r}
+# Plot
+df <- as_tibble(test_ranPCR$x, rownames = "sampleID")
+df %>%
+  ggplot(aes(x=PC1, y=PC2)) +
+  geom_point()
+# df %>%
+#   ggplot(aes(x=PC2, y=PC3)) +
+#   geom_point()
+```
+
+
+
+# How variable are 16S results naturally? Or is this a sign flipping problem?
+
+```{r}
+# Try out single PC for 16S
+test_betaParams <- betaParams(df_16s)
+test_ranPCR <-  ranPCA(test_betaParams)
+test_ranRelPct <- ranRelPct(test_betaParams)
+# Plot
+df <- as_tibble(test_ranPCR$x, rownames = "sampleID") %>%
+  mutate(cruise = case_when(str_detect(sampleID, "CN18S") ~ "CN18S",
+                            str_detect(sampleID, "CN18F") ~ "CN18F",
+                            str_detect(sampleID, "Lasker") ~ "Lasker",
+                            TRUE ~ "unknown")) %>%
+  select(sampleID, PC1, PC2,PC3, cruise)
+df %>%
+  ggplot(aes(x=PC1, y=PC2, color=cruise)) +
+  geom_point() #+
+  #geom_text(aes(label=sampleID))
+# df %>%
+#   ggplot(aes(x=PC2, y=PC3, color=cruise)) +
+#   geom_point()
+```
+
+```{r}
+# Try out single PC for 16S
+test_betaParams <- betaParams(df_16s)
+test_ranPCR <-  ranPCA(test_betaParams)
+test_ranRelPct <- ranRelPct(test_betaParams)
+# Plot
+df <- as_tibble(test_ranPCR$x, rownames = "sampleID") %>%
+  mutate(cruise = case_when(str_detect(sampleID, "CN18S") ~ "CN18S",
+                            str_detect(sampleID, "CN18F") ~ "CN18F",
+                            str_detect(sampleID, "Lasker") ~ "Lasker",
+                            TRUE ~ "unknown")) %>%
+  select(sampleID, PC1, PC2,PC3, cruise)
+df %>%
+  ggplot(aes(x=PC1, y=PC2, color=cruise)) +
+  geom_point() #+
+  #geom_text(aes(label=sampleID))
+# df %>%
+#   ggplot(aes(x=PC2, y=PC3, color=cruise)) +
+#   geom_point()
+```
+```{r}
+# Try out single PC for 16S
+test_betaParams <- betaParams(df_16s)
+test_ranPCR <-  ranPCA(test_betaParams)
+test_ranRelPct <- ranRelPct(test_betaParams)
+# Plot
+df <- as_tibble(test_ranPCR$x, rownames = "sampleID") %>%
+  mutate(cruise = case_when(str_detect(sampleID, "CN18S") ~ "CN18S",
+                            str_detect(sampleID, "CN18F") ~ "CN18F",
+                            str_detect(sampleID, "Lasker") ~ "Lasker",
+                            TRUE ~ "unknown")) %>%
+  select(sampleID, PC1, PC2,PC3, cruise)
+df %>%
+  ggplot(aes(x=PC1, y=PC2, color=cruise)) +
+  geom_point() #+
+  #geom_text(aes(label=sampleID))
+# df %>%
+#   ggplot(aes(x=PC2, y=PC3, color=cruise)) +
+#   geom_point()
+```
+
+
+```{r}
+# Try out single PC for 16S
+test_betaParams <- betaParams(df_16s)
+test_ranPCR <-  ranPCA(test_betaParams)
+test_ranRelPct <- ranRelPct(test_betaParams)
+# Plot
+df <- as_tibble(test_ranPCR$x, rownames = "sampleID") %>%
+  mutate(cruise = case_when(str_detect(sampleID, "CN18S") ~ "CN18S",
+                            str_detect(sampleID, "CN18F") ~ "CN18F",
+                            str_detect(sampleID, "Lasker") ~ "Lasker",
+                            TRUE ~ "unknown")) %>%
+  select(sampleID, PC1, PC2,PC3, cruise)
+df %>%
+  ggplot(aes(x=PC1, y=PC2, color=cruise)) +
+  geom_point()
+# df %>%
+#   ggplot(aes(x=PC2, y=PC3, color=cruise)) +
+#   geom_point()
+```
+# Is sign flipping of PC2 causing this 16S results?
+
+### functions
+plotPCs <- function(results, locus, pc.x = 1, pc.y = 2, ellipse.p = 0.95) {
+  scores <- extractPCA(results)$scores[[locus]]
+  
+  purrr::imap(split(scores, scores$sample), function(df, i) {
+    x <- dplyr::filter(df, pc == pc.x)$score
+    y <- dplyr::filter(df, pc == pc.y)$score
+    car::dataEllipse(x, y, levels = ellipse.p, draw = FALSE) |> 
+      as.data.frame() |> 
+      dplyr::mutate(sample = i)
+  }) |> 
+    dplyr::bind_rows() |> 
+    ggplot2::ggplot() +
+    ggplot2::geom_hline(yintercept = 0, color = 'darkred') +
+    ggplot2::geom_vline(xintercept = 0, color = 'darkred') +
+    ggplot2::geom_polygon(
+      ggplot2::aes(x, y, group = sample),
+      fill = NA,
+      color = 'black'
+    ) +
+    ggplot2::labs(
+      x = paste0('PC', pc.x),
+      y = paste0('PC', pc.y)
+    ) +
+    ggplot2::theme_minimal()
+}
+
+extractPCA <- function(results) {
+  pca.list <- pcaList(results)
+  
+  loadings <- lapply(pca.list, function(x) {
+    res <- abind::abind(x$rotation, along = 3) |> 
+      apply(2, function(x) {
+        to.switch <- sign(x[1, ]) != sign(x[1, 1])
+        x[, to.switch] <- x[, to.switch] * -1
+        x
+      }, simplify = FALSE) |> 
+      abind::abind(along = 3) |> 
+      aperm(c(1, 3, 2))
+    dimnames(res)[[3]] <- 1:dim(res)[3]
+    as.data.frame.table(res) |> 
+      stats::setNames(c('asv', 'pc', 'rep', 'loading')) |> 
+      dplyr::mutate(
+        asv = as.character(asv),
+        pc = as.numeric(gsub('PC', '', pc)),
+        rep = as.numeric(rep)
+      )
+  })
+  
+  scores <- lapply(pca.list, function(x) {
+    res <- abind::abind(x$x, along = 3) |> 
+      apply(2, function(x) {
+        to.switch <- sign(x[1, ]) != sign(x[1, 1])
+        x[, to.switch] <- x[, to.switch] * -1
+        x
+      }, simplify = FALSE) |> 
+      abind::abind(along = 3) |> 
+      aperm(c(1, 3, 2))
+    dimnames(res)[[3]] <- 1:dim(res)[3]
+    as.data.frame.table(res) |> 
+      stats::setNames(c('sample', 'pc', 'rep', 'score')) |> 
+      dplyr::mutate(
+        sample = as.character(sample),
+        pc = as.numeric(gsub('PC', '', pc)),
+        rep = as.numeric(rep)
+      )
+  })
+  
+  list(loadings = loadings, scores = scores)
+}
+
+```{r}
+# Extract PCA results from mambo run
+test_extractPCA <- extractPCA(test_Results)
+```
+
+# Look at range of values for same sample within a PC (16S)
+
+```{r}
+library(magrittr)
+df <- as_tibble(test_extractPCA$scores[[2]])
+# get stats by unique sample
+PC_stats <- df %>% 
+  filter(pc<4) %>%
+  #group_by(pc) %>%
+  group_by(pc, sample) %>%
+  mutate(num_reps = sum(rep)) %>%
+  mutate(avg_score = mean(score)) %>%
+  mutate(min_score = min(score)) %>%
+  mutate(max_score = max(score)) %>%
+  distinct(sample, .keep_all = TRUE) %>%
+  select(pc,sample, num_reps, avg_score, min_score, max_score) %>%
+  mutate(range = max_score - min_score) %>%
+  ungroup()
+
+PC_stats %>%
+  ggplot(aes(x=pc, y=range)) +
+  geom_point()
+
+```
+# Look at range of values for same sample within a PC (18S)
+
+```{r}
+library(magrittr)
+df <- as_tibble(test_extractPCA$scores[[1]])
+# get stats by unique sample
+PC_stats <- df %>% 
+  filter(pc<4) %>%
+  #group_by(pc) %>%
+  group_by(pc, sample) %>%
+  mutate(num_reps = sum(rep)) %>%
+  mutate(avg_score = mean(score)) %>%
+  mutate(min_score = min(score)) %>%
+  mutate(max_score = max(score)) %>%
+  distinct(sample, .keep_all = TRUE) %>%
+  select(pc,sample, num_reps, avg_score, min_score, max_score) %>%
+  mutate(range = max_score - min_score) %>%
+  ungroup()
+
+PC_stats %>%
+  ggplot(aes(x=pc, y=range)) +
+  geom_point()
+
+```
+
+
+
+

@@ -49,6 +49,24 @@ mambo <- function(
     run.label = 'mambo',
     output.log = TRUE
 ) {
+  start.time <- Sys.time()
+  if(output.log) {
+    log.fname <- paste0(run.label, '.', format(start.time, '%Y%m%d_%H%M%S.log'))
+    log.file <- file(log.fname, open = 'a')
+    sink(file = log.file, type = 'output', split = TRUE)
+  }
+  
+  cat('\n--------', format(Sys.time()), 'Starting MAMBO --------\n')
+  cat('  Number of replicates:', nrep, '\n')
+  cat('  MCMC parameters:\n')
+  cat('    Chains:', chains, '\n')
+  cat('    Adapt:', adapt, '\n')
+  cat('    Burnin:', burnin, '\n')
+  cat('    Total Samples:', total.samples, '\n')
+  cat('    Thinning:', thin, '\n')
+  if(output.log) cat('  Log file:', log.fname, '\n')
+  
+  cat('\n--------', format(Sys.time()), 'Occurrence Beta parameters --------\n')
   # compute beta parameter arrays
   resp.beta <- betaParams(resp.counts)
   pred.beta <- betaParams(pred.counts)
@@ -62,31 +80,24 @@ mambo <- function(
   # make sure rows are in same order for both sets of data
   resp.beta <- resp.beta[dimnames(pred.beta)[[1]], , ]
   
-  if(output.log) {
-    log.file <- file(format(Sys.time(), 'mambo.%Y%m%d_%H%M%S.log'), open = 'a')
-    sink(file = log.file, type = 'output', split = TRUE)
-    sink(file = log.file, type = 'message')
-  }
-  
   # do nrep iterations, save results to list, and write to RDS file
-  start.time <- Sys.time()
   reps <- lapply(1:nrep, function(i) {
-    message('\n-------------')
-    message(format(Sys.time()), ' : Begin replicate ', i)
-    message('-------------\n')
-
+    cat('\n--------', format(Sys.time()), 'Replicate ')
+    cat(i, '/', nrep, sep = '')
+    cat(' --------\n')
+    
     # Extract PCs -------------------------------------------------------------
-    message('  Extracting PCs...\n')
+    cat('  PCA...\n')
     pca <- stats::setNames(
       list(ranPCA(resp.beta), ranPCA(pred.beta)),
       c(resp.label, pred.label)
     )
     pca[[resp.label]]$num.pcs <- numImpPCs(pca[[resp.label]])
     pca[[pred.label]]$num.pcs <- numImpPCs(pca[[pred.label]])
-
+    
     # Run Bayesian model ------------------------------------------------------
-    message('  Running Bayesian model...\n')
-    post <- jagsPClm(
+    cat('  Bayesian model...\n')
+    capture.output(post <- jagsPClm(
       pc.resp = pca[[resp.label]]$x[, 1:pca[[resp.label]]$num.pcs],
       pc.preds = pca[[pred.label]]$x[, 1:pca[[pred.label]]$num.pcs],
       chains = chains,
@@ -94,17 +105,13 @@ mambo <- function(
       burnin = burnin,
       total.samples = total.samples,
       thin = thin
-    )
-
-    message('\n-------------')
-    message(
-      format(Sys.time()), ' : ',
-      'Replicate ', i, ' time elapsed: ',
-      format(round(swfscMisc::autoUnits(post$timetaken), 2))
-    )
-    message('-------------\n')
-
-    # Extract posterior and name dimensions -----------------------------------
+    ))
+    
+    # Compute posterior summary statistics ------------------------------------
+    cat('  Summarize posterior...\n')
+    capture.output(post.smry <- summary(post, silent.jags = TRUE))
+    
+    # Extract posterior and label dimensions -----------------------------------
     p <- swfscMisc::runjags2list(post)
     dimnames(p$intercept)[[1]] <-
       dimnames(p$b.prime)[[1]] <-
@@ -112,13 +119,18 @@ mambo <- function(
       dimnames(p$v)[[1]] <- paste0(resp.label, '.PC', 1:pca[[resp.label]]$num.pcs)
     dimnames(p$b.prime)[[2]] <-
       dimnames(p$w)[[2]] <- paste0(pred.label, '.PC', 1:pca[[pred.label]]$num.pcs)
-
-    list(pca = pca, post.smry = summary(post, silent.jags = TRUE), post.list = p)
+    
+    cat(
+      '  End replicate:', 
+      format(round(swfscMisc::autoUnits(post$timetaken))),
+      '\n'
+    )
+    list(pca = pca, post.smry = post.smry, post.list = p)
   })
   end.time = Sys.time()
-
+  
   res <- list(
-    filename = paste0(run.label, '.', format(Sys.time(), '%Y%m%d_%H%M%S.rds')),
+    filename = paste0(run.label, '.', format(start.time, '%Y%m%d_%H%M%S.rds')),
     labels = c(run = run.label, resp = resp.label, pred = pred.label),
     params = c(
       nrep = nrep, chains = chains, adapt = adapt,
@@ -132,28 +144,24 @@ mambo <- function(
     reps = reps
   )
   saveRDS(res, res$filename)
-
-  message('\n-------------')
-  message(format(Sys.time()), ' : End replicates')
-  message('Number of replicates: ', nrep)
-  message('MCMC parameters:')
-  message('  Chains: ', chains)
-  message('  Adapt: ', adapt)
-  message('  Burnin: ', burnin)
-  message('  Total Samples: ', total.samples)
-  message('  Thinning: ', thin)
-  message(
-    'Total elapsed time: ', format(round(swfscMisc::autoUnits(res$run.time$elapsed), 2)),
-    ' (', format(round(swfscMisc::autoUnits(res$run.time$elapsed / nrep), 2)), ' per replicate)'
+  
+  cat('\n--------', format(Sys.time()), 'End MAMBO --------\n')
+  cat('  Number of replicates:', nrep, '\n')
+  cat('  MCMC parameters:\n')
+  cat('    Chains:', chains, '\n')
+  cat('    Adapt:', adapt, '\n')
+  cat('    Burnin:', burnin, '\n')
+  cat('    Total Samples:', total.samples, '\n')
+  cat('    Thinning:', thin, '\n')
+  cat(
+    '  Total elapsed time: ', 
+    format(round(swfscMisc::autoUnits(res$run.time$elapsed), 1)),
+    '\n',
+    sep = ''
   )
-  message('\n')
-  message('File saved to: ', res$filename)
-  message('-------------\n')
-
-  if(output.log) {
-    sink(type = 'output')
-    sink(type = 'message')
-  }
-
+  cat('  Results saved to:', res$filename, '\n')
+  
+  closeAllConnections()
+  capture.output(gc(verbose = FALSE))
   invisible(res)
 }

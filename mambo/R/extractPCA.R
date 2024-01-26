@@ -13,17 +13,19 @@
 extractPCA <- function(results) {
   pca.list <- pcaList(results)
   
+  .switchSigns <- function(x) {
+    # use sample (row) with largest absolute loading on first replicate (column) as reference for sign
+    ref.index <- which.max(abs(x[, 1]))
+    # identify replicates (columns) that have a different sign from reference
+    to.switch <- sign(x[ref.index, ]) != sign(x[ref.index, 1])
+    # switch sign of replicates that need it
+    x[, to.switch] <- x[, to.switch] * -1
+    x
+  }
+  
   loadings <- lapply(pca.list, function(rep) {
     res <- abind::abind(rep$rotation, along = 3) |> 
-      apply(2, function(x) {
-        # use ASV (row) with largest absolute loading on first replicate (column) as reference for sign
-        ref.index <- which.max(abs(x[, 1]))
-        # identify replicates (columns) that have a different sign from reference
-        to.switch <- sign(x[ref.index, ]) != sign(x[ref.index, 1])
-        # switch sign of replicates that need it
-        x[, to.switch] <- x[, to.switch] * -1
-        x
-      }, simplify = FALSE) |> 
+      apply(2, .switchSigns, simplify = FALSE) |> 
       abind::abind(along = 3) |> 
       aperm(c(1, 3, 2))
     dimnames(res)[[3]] <- 1:dim(res)[3]
@@ -38,15 +40,7 @@ extractPCA <- function(results) {
   
   scores <- lapply(pca.list, function(rep) {
     res <- abind::abind(rep$x, along = 3) |> 
-      apply(2, function(x) {
-        # use sample (row) with largest absolute score on first replicate (column) as reference for sign
-        ref.index <- which.max(abs(x[, 1]))
-        # identify replicates (columns) that have a different sign from reference
-        to.switch <- sign(x[ref.index, ]) != sign(x[ref.index, 1])
-        # switch sign of replicates that need it
-        x[, to.switch] <- x[, to.switch] * -1
-        x
-      }, simplify = FALSE) |> 
+      apply(2, .switchSigns, simplify = FALSE) |> 
       abind::abind(along = 3) |> 
       aperm(c(1, 3, 2))
     dimnames(res)[[3]] <- 1:dim(res)[3]

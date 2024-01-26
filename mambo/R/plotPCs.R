@@ -6,6 +6,7 @@
 #' @param pc.x number of x-axis principal component.
 #' @param pc.y number of y-axis principal component.
 #' @param ellipse.p probability density level of ellipse.
+#' @param plot display plot?
 #'
 #' @return PCA biplot of scores with confidence ellipses for each sample.
 #'
@@ -13,10 +14,10 @@
 #'
 #' @export
 #'
-plotPCs <- function(results, locus, pc.x = 1, pc.y = 2, ellipse.p = 0.95) {
+plotPCs <- function(results, locus, pc.x = 1, pc.y = 2, ellipse.p = 0.95, plot = TRUE) {
   scores <- extractPCA(results)$scores[[locus]]
   
-  purrr::imap(split(scores, scores$sample), function(df, i) {
+  gg <- purrr::imap(split(scores, scores$sample), function(df, i) {
     x <- dplyr::filter(df, pc == pc.x)$score
     y <- dplyr::filter(df, pc == pc.y)$score
     car::dataEllipse(x, y, levels = ellipse.p, draw = FALSE) |> 
@@ -34,7 +35,11 @@ plotPCs <- function(results, locus, pc.x = 1, pc.y = 2, ellipse.p = 0.95) {
     ) +
     ggplot2::labs(
       x = paste0('PC', pc.x),
-      y = paste0('PC', pc.y)
+      y = paste0('PC', pc.y),
+      title = locus
     ) +
     ggplot2::theme_minimal()
+  
+  if(plot) print(gg)
+  invisible(gg)
 }
