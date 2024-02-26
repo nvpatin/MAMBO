@@ -2,6 +2,7 @@
 % Please edit documentation in R/mambo_package.R
 \docType{package}
 \name{mambo_package}
+\alias{-package}
 \alias{mambo_package}
 \alias{mamboTutorial}
 \alias{mambo-package}

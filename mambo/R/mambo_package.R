@@ -22,6 +22,16 @@ mamboTutorial <- function() {
 }
 
 #' @docType data
+#' @name counts.12s
+#' @title 12S ASV Read Counts
+#' @description << add a description >>
+#' @usage data(counts.12s)
+#' @format data.frame
+#' @references << add a reference >>
+#' @keywords datasets
+NULL
+
+#' @docType data
 #' @name counts.16s
 #' @title 16S ASV Read Counts
 #' @description << add a description >>
@@ -42,6 +52,26 @@ NULL
 NULL
 
 #' @docType data
+#' @name counts.COI
+#' @title COI ASV Read Counts
+#' @description << add a description >>
+#' @usage data(counts.COI)
+#' @format data.frame
+#' @references << add a reference >>
+#' @keywords datasets
+NULL
+
+#' @docType data
+#' @name taxa.12s
+#' @title 12S ASV Taxonomy
+#' @description << add a description >>
+#' @usage data(taxa.12s)
+#' @format data.frame
+#' @references << add a reference >>
+#' @keywords datasets
+NULL
+
+#' @docType data
 #' @name taxa.16s
 #' @title 16S ASV Taxonomy
 #' @description << add a description >>
@@ -56,6 +86,16 @@ NULL
 #' @title 18S ASV Taxonomy
 #' @description << add a description >>
 #' @usage data(taxa.18s)
+#' @format data.frame
+#' @references << add a reference >>
+#' @keywords datasets
+NULL
+
+#' @docType data
+#' @name taxa.COI
+#' @title COI ASV Taxonomy
+#' @description << add a description >>
+#' @usage data(taxa.COI)
 #' @format data.frame
 #' @references << add a reference >>
 #' @keywords datasets

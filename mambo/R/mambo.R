@@ -95,30 +95,32 @@ mambo <- function(
     pca[[resp.label]]$num.pcs <- numImpPCs(pca[[resp.label]])
     pca[[pred.label]]$num.pcs <- numImpPCs(pca[[pred.label]])
     
-    # Run Bayesian model ------------------------------------------------------
-    cat('  Bayesian model...\n')
-    capture.output(post <- jagsPClm(
-      pc.resp = pca[[resp.label]]$x[, 1:pca[[resp.label]]$num.pcs],
-      pc.preds = pca[[pred.label]]$x[, 1:pca[[pred.label]]$num.pcs],
-      chains = chains,
-      adapt = adapt,
-      burnin = burnin,
-      total.samples = total.samples,
-      thin = thin
-    ))
-    
-    # Compute posterior summary statistics ------------------------------------
-    cat('  Summarize posterior...\n')
-    capture.output(post.smry <- summary(post, silent.jags = TRUE))
-    
-    # Extract posterior and label dimensions -----------------------------------
-    p <- swfscMisc::runjags2list(post)
-    dimnames(p$intercept)[[1]] <-
-      dimnames(p$b.prime)[[1]] <-
-      dimnames(p$w)[[1]] <-
-      dimnames(p$v)[[1]] <- paste0(resp.label, '.PC', 1:pca[[resp.label]]$num.pcs)
-    dimnames(p$b.prime)[[2]] <-
-      dimnames(p$w)[[2]] <- paste0(pred.label, '.PC', 1:pca[[pred.label]]$num.pcs)
+    if(bayesian) {
+      # Run Bayesian model ------------------------------------------------------
+      cat('  Bayesian model...\n')
+      capture.output(post <- jagsPClm(
+        pc.resp = pca[[resp.label]]$x[, 1:pca[[resp.label]]$num.pcs],
+        pc.preds = pca[[pred.label]]$x[, 1:pca[[pred.label]]$num.pcs],
+        chains = chains,
+        adapt = adapt,
+        burnin = burnin,
+        total.samples = total.samples,
+        thin = thin
+      ))
+      
+      # Compute posterior summary statistics ------------------------------------
+      cat('  Summarize posterior...\n')
+      capture.output(post.smry <- summary(post, silent.jags = TRUE))
+      
+      # Extract posterior and label dimensions -----------------------------------
+      p <- swfscMisc::runjags2list(post)
+      dimnames(p$intercept)[[1]] <-
+        dimnames(p$b.prime)[[1]] <-
+        dimnames(p$w)[[1]] <-
+        dimnames(p$v)[[1]] <- paste0(resp.label, '.PC', 1:pca[[resp.label]]$num.pcs)
+      dimnames(p$b.prime)[[2]] <-
+        dimnames(p$w)[[2]] <- paste0(pred.label, '.PC', 1:pca[[pred.label]]$num.pcs)
+    }
     
     cat(
       '  End replicate:', 
