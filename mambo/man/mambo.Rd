@@ -10,6 +10,7 @@ mambo(
   pred.label,
   pred.counts,
   nrep = 10,
+  bayesian = TRUE,
   chains = 3,
   adapt = 100,
   burnin = 1000,
@@ -29,6 +30,8 @@ mambo(
 \item{pred.counts}{ASV counts of predictor locus.}
 
 \item{nrep}{number of MAMBO replicates to run.}
+
+\item{bayesian}{logical. Run the Bayesian analysis?}
 
 \item{chains}{number of MCMC chains.}
 

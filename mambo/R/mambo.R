@@ -6,6 +6,7 @@
 #' @param pred.label label for predictor locus.
 #' @param pred.counts ASV counts of predictor locus.
 #' @param nrep number of MAMBO replicates to run.
+#' @param bayesian logical. Run the Bayesian analysis?
 #' @param chains number of MCMC chains.
 #' @param adapt number of adaptation iterations.
 #' @param burnin number of burnin iterations.
@@ -41,6 +42,7 @@ mambo <- function(
     resp.label, resp.counts, 
     pred.label, pred.counts,
     nrep = 10,
+    bayesian = TRUE,
     chains = 3,
     adapt = 100,
     burnin = 1000,
@@ -95,10 +97,12 @@ mambo <- function(
     pca[[resp.label]]$num.pcs <- numImpPCs(pca[[resp.label]])
     pca[[pred.label]]$num.pcs <- numImpPCs(pca[[pred.label]])
     
+    post.smry <- p <- NULL
+    
     if(bayesian) {
       # Run Bayesian model ------------------------------------------------------
       cat('  Bayesian model...\n')
-      capture.output(post <- jagsPClm(
+      utils::capture.output(post <- jagsPClm(
         pc.resp = pca[[resp.label]]$x[, 1:pca[[resp.label]]$num.pcs],
         pc.preds = pca[[pred.label]]$x[, 1:pca[[pred.label]]$num.pcs],
         chains = chains,
@@ -110,7 +114,7 @@ mambo <- function(
       
       # Compute posterior summary statistics ------------------------------------
       cat('  Summarize posterior...\n')
-      capture.output(post.smry <- summary(post, silent.jags = TRUE))
+      utils::capture.output(post.smry <- summary(post, silent.jags = TRUE))
       
       # Extract posterior and label dimensions -----------------------------------
       p <- swfscMisc::runjags2list(post)
@@ -164,6 +168,6 @@ mambo <- function(
   cat('  Results saved to:', res$filename, '\n')
   
   closeAllConnections()
-  capture.output(gc(verbose = FALSE))
+  utils::capture.output(gc(verbose = FALSE))
   invisible(res)
 }
