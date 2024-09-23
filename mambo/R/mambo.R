@@ -60,12 +60,14 @@ mambo <- function(
   
   cat('\n--------', format(Sys.time()), 'Starting MAMBO --------\n')
   cat('  Number of replicates:', nrep, '\n')
-  cat('  MCMC parameters:\n')
-  cat('    Chains:', chains, '\n')
-  cat('    Adapt:', adapt, '\n')
-  cat('    Burnin:', burnin, '\n')
-  cat('    Total Samples:', total.samples, '\n')
-  cat('    Thinning:', thin, '\n')
+  if(bayesian) {
+    cat('  MCMC parameters:\n')
+    cat('    Chains:', chains, '\n')
+    cat('    Adapt:', adapt, '\n')
+    cat('    Burnin:', burnin, '\n')
+    cat('    Total Samples:', total.samples, '\n')
+    cat('    Thinning:', thin, '\n')
+  }
   if(output.log) cat('  Log file:', log.fname, '\n')
   
   cat('\n--------', format(Sys.time()), 'Occurrence Beta parameters --------\n')
@@ -84,12 +86,13 @@ mambo <- function(
   
   # do nrep iterations, save results to list, and write to RDS file
   reps <- lapply(1:nrep, function(i) {
-    cat('\n--------', format(Sys.time()), 'Replicate ')
+    start.time <- Sys.time()
+    cat('\n-------- Replicate ')
     cat(i, '/', nrep, sep = '')
     cat(' --------\n')
     
     # Extract PCs -------------------------------------------------------------
-    cat('  PCA...\n')
+    cat(' ', format(Sys.time()), 'PCA...\n')
     pca <- stats::setNames(
       list(ranPCA(resp.beta), ranPCA(pred.beta)),
       c(resp.label, pred.label)
@@ -101,7 +104,7 @@ mambo <- function(
     
     if(bayesian) {
       # Run Bayesian model ------------------------------------------------------
-      cat('  Bayesian model...\n')
+      cat(' ', format(Sys.time()), 'Bayesian model...\n')
       utils::capture.output(post <- jagsPClm(
         pc.resp = pca[[resp.label]]$x[, 1:pca[[resp.label]]$num.pcs],
         pc.preds = pca[[pred.label]]$x[, 1:pca[[pred.label]]$num.pcs],
@@ -113,7 +116,7 @@ mambo <- function(
       ))
       
       # Compute posterior summary statistics ------------------------------------
-      cat('  Summarize posterior...\n')
+      cat(' ', format(Sys.time()), 'Summarize posterior...\n')
       utils::capture.output(post.smry <- summary(post, silent.jags = TRUE))
       
       # Extract posterior and label dimensions -----------------------------------
@@ -126,9 +129,11 @@ mambo <- function(
         dimnames(p$w)[[2]] <- paste0(pred.label, '.PC', 1:pca[[pred.label]]$num.pcs)
     }
     
+    end.time <- Sys.time()
+    elapsed <- difftime(end.time, start.time)
     cat(
       '  End replicate:', 
-      format(round(swfscMisc::autoUnits(post$timetaken))),
+      format(round(swfscMisc::autoUnits(elapsed))),
       '\n'
     )
     list(pca = pca, post.smry = post.smry, post.list = p)
@@ -153,12 +158,14 @@ mambo <- function(
   
   cat('\n--------', format(Sys.time()), 'End MAMBO --------\n')
   cat('  Number of replicates:', nrep, '\n')
-  cat('  MCMC parameters:\n')
-  cat('    Chains:', chains, '\n')
-  cat('    Adapt:', adapt, '\n')
-  cat('    Burnin:', burnin, '\n')
-  cat('    Total Samples:', total.samples, '\n')
-  cat('    Thinning:', thin, '\n')
+  if(bayesian) {
+    cat('  MCMC parameters:\n')
+    cat('    Chains:', chains, '\n')
+    cat('    Adapt:', adapt, '\n')
+    cat('    Burnin:', burnin, '\n')
+    cat('    Total Samples:', total.samples, '\n')
+    cat('    Thinning:', thin, '\n')
+  }
   cat(
     '  Total elapsed time: ', 
     format(round(swfscMisc::autoUnits(res$run.time$elapsed), 1)),
