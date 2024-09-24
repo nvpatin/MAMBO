@@ -20,6 +20,7 @@ plotPCs <- function(results, locus, pc.x = 1, pc.y = 2,
                     type = c('ellipse', 'density'), ellipse.p = 0.95, 
                     num.bins = 50, plot = TRUE) {
   if(missing(locus)) stop("'locus' must be specified.")
+  if(!locus %in% results$labels[c('resp', 'pred')]) stop("locus '", locus, "' is not in 'results'")
   scores <- extractPCA(results)$scores[[locus]]
   
   prop.var <- sapply(
