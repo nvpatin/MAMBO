@@ -18,7 +18,7 @@ docker build --build-arg WHEN=2025-01-25 --no-cache -t mambotest:0.1.0 .
 3. Option #1: Run the image from Docker Desktop. In the "Images" menu item, hit the "play" icon for the MAMBO image. Then, expand the "Optional settings" menu. Under "Ports" type "8787" for "Host port." Under "Volumes" provide the local directory path containing the data files you need to run MAMBO ("Host path") and "/home/rstudio/{optional-name}" in the "Container path," where {optional-name} is a directory name you want for your image working directory. Under "Environment variables" set "Variable" to "PASSWORD" and "Value" to "password" (or your password of choice). Click "run" to start running the image interactively .
 
 4.  Option #2: Run the image from the command line. As with Docker Desktop, set the directory with your test files in /home/rstudio to access them from RStudio.
-
+5. 
     ```
 docker run --rm -it -e PASSWORD=password -p 8787:8787 \
 -v "/Users/Home/MAMBO/test-files":/home/rstudio/mambotest \
@@ -36,6 +36,7 @@ The ASV tables should have samples as columns, ASVs as rows, and an empty A1 cel
 The taxonomy tables should have ASVs as rows and taxonomy ranks in subsequent columns, which each rank in its own column. 
 
 1. In RStudio, import ASV and taxonomy tables 
+
     ```
 asv.16s <- read.csv(file="mambotest/CANON_2018_data/Merged2018_16S_otu_filtered.csv")
 asv.18s <- read.csv(file="mambotest/CANON_2018_data/Merged2018_18S_otu_filtered.csv")
