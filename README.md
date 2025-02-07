@@ -4,7 +4,6 @@ MAMBO is program to analyze eDNA metabarcoding sequence data from multiple marke
 ## Installation
 We highly recommend installing MAMBO via Docker. There are several R library dependencies that may otherwise result in conflicts.
 
-### Running MAMBO with Docker
 These instructions assume you have Docker and Docker Desktop already installed. 
 
 1. Download the Dockerfile provided in this repo. It must be named "dockerfile", with no extension or capitalizations
@@ -36,8 +35,7 @@ The ASV tables should have samples as columns, ASVs as rows, and an empty A1 cel
 
 The taxonomy tables should have ASVs as rows and taxonomy ranks in subsequent columns, which each rank in its own column. 
 
-1. Import tables with rows as ASVs, columns as samples, and the first column as ASV labels
-
+1. In RStudio, import ASV and taxonomy tables 
     ```
 asv.16s <- read.csv(file="mambotest/CANON_2018_data/Merged2018_16S_otu_filtered.csv")
 asv.18s <- read.csv(file="mambotest/CANON_2018_data/Merged2018_18S_otu_filtered.csv")
@@ -45,7 +43,7 @@ tax.16s <- read.csv(file="mambotest/CANON_2018_data/Merged2018_16S_taxa_filtered
 tax.18s <- read.csv(file="mambotest/CANON_2018_data/Merged2018_18S_taxa_filtered.csv")
 ```
 
-2. Convert with 'data.frame' and set 'row.names=1', e.g.:
+2. Convert ASV tables to data frames
 
     ```
 asv.16s <- data.frame(asv.16s, row.names=1)
