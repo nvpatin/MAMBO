@@ -93,7 +93,6 @@ result <- mambo(
 ```
 # Need those `` symbols
 result$reps[[1]]$pca$`16S`
-# Individual functions
 ```
 
 5. Visualize the sign switching
@@ -109,3 +108,15 @@ plotPCs(result, "16S", pc.x=1, pc.y=2, type="density")
 plotPCs(result, "18S", pc.x=1, pc.y=2, type="density")
 ```
 
+7. Extract PC scores
+
+```
+scores.16S <- extractPCA(result)$scores[['16S']]
+scores.18S <- extractPCA(result)$scores[['18S']]
+```
+
+8. Plot outlier ASV loadings for a select PC
+
+```
+outlierLoadings(result, "16S", pc=1) # need the 'pc' argument
+```
