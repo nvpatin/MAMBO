@@ -28,7 +28,7 @@ plotPCs <- function(results, locus, pc.x = 1, pc.y = 2,
     function(r) r$pca[[locus]]$importance['Proportion of Variance', c(pc.x, pc.y)]
   ) |> 
     t() |> 
-    apply(2, median)
+    apply(2, stats::median)
 
   type <- match.arg(type)
   df <- if(type == 'ellipse') {

@@ -97,8 +97,20 @@ mambo <- function(
       list(ranPCA(resp.beta), ranPCA(pred.beta)),
       c(resp.label, pred.label)
     )
-    pca[[resp.label]]$num.pcs <- numImpPCs(pca[[resp.label]])
-    pca[[pred.label]]$num.pcs <- numImpPCs(pca[[pred.label]])
+    
+    n <- mambo:::numImpPCs(pca[[resp.label]])
+    pca[[resp.label]]$rotation <- pca[[resp.label]]$rotation[, 1:n]
+    pca[[resp.label]]$x<- pca[[resp.label]]$x[1:n, 1:n]
+    pca[[resp.label]]$importance <- pca[[resp.label]]$importance[, 1:n]
+    pca[[resp.label]]$num.pcs <- n
+    pca[[resp.label]]$sdev <- pca[[resp.label]]$center <- pca[[resp.label]]$scale <- NULL
+    
+    n <- mambo:::numImpPCs(pca[[pred.label]])
+    pca[[pred.label]]$rotation <- pca[[pred.label]]$rotation[, 1:n]
+    pca[[pred.label]]$x<- pca[[pred.label]]$x[1:n, 1:n]
+    pca[[pred.label]]$importance <- pca[[pred.label]]$importance[, 1:n]
+    pca[[pred.label]]$num.pcs <- n
+    pca[[pred.label]]$sdev <- pca[[pred.label]]$center <- pca[[pred.label]]$scale <- NULL
     
     post.smry <- p <- NULL
     
