@@ -98,14 +98,14 @@ mambo <- function(
       c(resp.label, pred.label)
     )
     
-    n <- mambo:::numImpPCs(pca[[resp.label]])
+    n <- numImpPCs(pca[[resp.label]])
     pca[[resp.label]]$rotation <- pca[[resp.label]]$rotation[, 1:n]
     pca[[resp.label]]$x<- pca[[resp.label]]$x[1:n, 1:n]
     pca[[resp.label]]$importance <- pca[[resp.label]]$importance[, 1:n]
     pca[[resp.label]]$num.pcs <- n
     pca[[resp.label]]$sdev <- pca[[resp.label]]$center <- pca[[resp.label]]$scale <- NULL
     
-    n <- mambo:::numImpPCs(pca[[pred.label]])
+    n <- numImpPCs(pca[[pred.label]])
     pca[[pred.label]]$rotation <- pca[[pred.label]]$rotation[, 1:n]
     pca[[pred.label]]$x<- pca[[pred.label]]$x[1:n, 1:n]
     pca[[pred.label]]$importance <- pca[[pred.label]]$importance[, 1:n]
@@ -118,8 +118,10 @@ mambo <- function(
       # Run Bayesian model ------------------------------------------------------
       cat(' ', format(Sys.time()), 'Bayesian model...\n')
       utils::capture.output(post <- jagsPClm(
-        pc.resp = pca[[resp.label]]$x[, 1:pca[[resp.label]]$num.pcs],
-        pc.preds = pca[[pred.label]]$x[, 1:pca[[pred.label]]$num.pcs],
+        pc.resp = pca[[resp.label]]$x,
+        pc.preds = pca[[pred.label]]$x,
+        # pc.resp = pca[[resp.label]]$x[, 1:pca[[resp.label]]$num.pcs],
+        # pc.preds = pca[[pred.label]]$x[, 1:pca[[pred.label]]$num.pcs],
         chains = chains,
         adapt = adapt,
         burnin = burnin,
@@ -136,9 +138,9 @@ mambo <- function(
       dimnames(p$intercept)[[1]] <-
         dimnames(p$b.prime)[[1]] <-
         dimnames(p$w)[[1]] <-
-        dimnames(p$v)[[1]] <- paste0(resp.label, '.PC', 1:pca[[resp.label]]$num.pcs)
+        dimnames(p$v)[[1]] <- paste0(resp.label, '.PC', 1:nrow(p$v))
       dimnames(p$b.prime)[[2]] <-
-        dimnames(p$w)[[2]] <- paste0(pred.label, '.PC', 1:pca[[pred.label]]$num.pcs)
+        dimnames(p$w)[[2]] <- paste0(pred.label, '.PC', 1:ncol(p$w))
     }
     
     end.time <- Sys.time()
