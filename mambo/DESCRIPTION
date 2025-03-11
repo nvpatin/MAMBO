@@ -29,4 +29,5 @@ Imports:
   purrr,
   tidyr,
   ggplot2,
-  swfscMisc
+  swfscMisc,
+  parallel

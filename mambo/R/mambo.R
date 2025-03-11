@@ -6,6 +6,9 @@
 #' @param pred.label label for predictor locus.
 #' @param pred.counts ASV counts of predictor locus.
 #' @param nrep number of MAMBO replicates to run.
+#' @param num.cores number of cores to use for sampling relative percent 
+#'    occurrence. Defaults to value reported by \link[parallel]{detectCores} 
+#'    minus 1.
 #' @param bayesian logical. Run the Bayesian analysis?
 #' @param chains number of MCMC chains.
 #' @param adapt number of adaptation iterations.
@@ -42,6 +45,7 @@ mambo <- function(
     resp.label, resp.counts, 
     pred.label, pred.counts,
     nrep = 10,
+    num.cores = parallel::detectCores() - 1,
     bayesian = TRUE,
     chains = 3,
     adapt = 100,
@@ -82,7 +86,23 @@ mambo <- function(
   )) stop("sample names in 'resp.counts' and 'pred.counts' are not the same.")
   
   # make sure rows are in same order for both sets of data
-  resp.beta <- resp.beta[dimnames(pred.beta)[[1]], , ]
+  sample.ids <- sort(intersect(colnames(resp.counts), colnames(pred.counts)))
+  missing.resp.ids <- setdiff(colnames(resp.counts), sample.ids)
+  if(length(missing.resp.ids) > 0) {
+    message(
+      'The following ids from ', resp.label, ' are missing in ', pred.label, ': ', 
+      paste(missing.resp.ids, collapse = ', ')
+    )
+  }
+  missing.pred.ids <- setdiff(colnames(pred.counts), sample.ids)
+  if(length(missing.pred.ids) > 0) {
+    message(
+      'The following ids from ', pred.label, ' are missing in ', resp.label, ': ', 
+      paste(missing.pred.ids, collapse = ', ')
+    )
+  }
+  resp.beta <- resp.beta[sample.ids, , ]
+  pred.beta <- pred.beta[sample.ids, , ]
   
   # do nrep iterations, save results to list, and write to RDS file
   reps <- lapply(1:nrep, function(i) {
@@ -94,34 +114,24 @@ mambo <- function(
     # Extract PCs -------------------------------------------------------------
     cat(' ', format(Sys.time()), 'PCA...\n')
     pca <- stats::setNames(
-      list(ranPCA(resp.beta), ranPCA(pred.beta)),
+      list(
+        resp.beta |> 
+          ranPCA(num.cores) |> 
+          impPCs(),
+        pred.beta |> 
+          ranPCA(num.cores) |> 
+          impPCs()
+      ),
       c(resp.label, pred.label)
     )
     
-    n <- numImpPCs(pca[[resp.label]])
-    pca[[resp.label]]$rotation <- pca[[resp.label]]$rotation[, 1:n]
-    pca[[resp.label]]$x<- pca[[resp.label]]$x[1:n, 1:n]
-    pca[[resp.label]]$importance <- pca[[resp.label]]$importance[, 1:n]
-    pca[[resp.label]]$num.pcs <- n
-    pca[[resp.label]]$sdev <- pca[[resp.label]]$center <- pca[[resp.label]]$scale <- NULL
-    
-    n <- numImpPCs(pca[[pred.label]])
-    pca[[pred.label]]$rotation <- pca[[pred.label]]$rotation[, 1:n]
-    pca[[pred.label]]$x<- pca[[pred.label]]$x[1:n, 1:n]
-    pca[[pred.label]]$importance <- pca[[pred.label]]$importance[, 1:n]
-    pca[[pred.label]]$num.pcs <- n
-    pca[[pred.label]]$sdev <- pca[[pred.label]]$center <- pca[[pred.label]]$scale <- NULL
-    
     post.smry <- p <- NULL
-    
     if(bayesian) {
       # Run Bayesian model ------------------------------------------------------
       cat(' ', format(Sys.time()), 'Bayesian model...\n')
       utils::capture.output(post <- jagsPClm(
         pc.resp = pca[[resp.label]]$x,
         pc.preds = pca[[pred.label]]$x,
-        # pc.resp = pca[[resp.label]]$x[, 1:pca[[resp.label]]$num.pcs],
-        # pc.preds = pca[[pred.label]]$x[, 1:pca[[pred.label]]$num.pcs],
         chains = chains,
         adapt = adapt,
         burnin = burnin,

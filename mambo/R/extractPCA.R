@@ -24,7 +24,8 @@ extractPCA <- function(results) {
   }
   
   loadings <- lapply(pca.list, function(rep) {
-    rot <- lapply(rep$rotation, function(x) x[, 1:min(rep$num.pcs)])
+    min.pcs <- min(sapply(rep$rotation, function(x) dim(x)[2]))
+    rot <- lapply(rep$rotation, function(x) x[, 1:min.pcs])
     res <- abind::abind(rot, along = 3) |> 
       apply(2, .switchSigns, simplify = FALSE) |> 
       abind::abind(along = 3) |> 
@@ -40,7 +41,8 @@ extractPCA <- function(results) {
   })
   
   scores <- lapply(pca.list, function(rep) {
-    sc <- lapply(rep$x, function(x) x[1:min(rep$num.pcs), 1:min(rep$num.pcs)])
+    min.pcs <- min(sapply(rep$x, function(x) dim(x)[2]))
+    sc <- lapply(rep$x, function(x) x[1:min.pcs, 1:min.pcs])
     res <- abind::abind(sc, along = 3) |> 
       apply(2, .switchSigns, simplify = FALSE) |> 
       abind::abind(along = 3) |> 
