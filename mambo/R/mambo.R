@@ -86,23 +86,7 @@ mambo <- function(
   )) stop("sample names in 'resp.counts' and 'pred.counts' are not the same.")
   
   # make sure rows are in same order for both sets of data
-  sample.ids <- sort(intersect(colnames(resp.counts), colnames(pred.counts)))
-  missing.resp.ids <- setdiff(colnames(resp.counts), sample.ids)
-  if(length(missing.resp.ids) > 0) {
-    message(
-      'The following ids from ', resp.label, ' are missing in ', pred.label, ': ', 
-      paste(missing.resp.ids, collapse = ', ')
-    )
-  }
-  missing.pred.ids <- setdiff(colnames(pred.counts), sample.ids)
-  if(length(missing.pred.ids) > 0) {
-    message(
-      'The following ids from ', pred.label, ' are missing in ', resp.label, ': ', 
-      paste(missing.pred.ids, collapse = ', ')
-    )
-  }
-  resp.beta <- resp.beta[sample.ids, , ]
-  pred.beta <- pred.beta[sample.ids, , ]
+  resp.beta <- resp.beta[dimnames(pred.beta)[[1]], , ]
   
   # do nrep iterations, save results to list, and write to RDS file
   reps <- lapply(1:nrep, function(i) {

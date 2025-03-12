@@ -11,6 +11,14 @@ pred.counts <- read.csv('GOMECC Data/GOMECC_16S_ASV_table-V2.csv') |>
   column_to_rownames('hash') |> 
   filterCountData()
 
+results <- mambo(
+  '18s', resp.counts, 
+  '16s', pred.counts,
+  nrep = 10, 
+  bayesian = FALSE
+)
+
+
 x <- mambo(
   '18s', filterCountData(counts.18s), 
   '16s', filterCountData(counts.16s),
