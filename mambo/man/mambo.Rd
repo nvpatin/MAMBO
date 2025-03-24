@@ -10,6 +10,7 @@ mambo(
   pred.label,
   pred.counts,
   nrep = 10,
+  num.cores = parallel::detectCores() - 1,
   bayesian = TRUE,
   chains = 3,
   adapt = 100,
@@ -30,6 +31,10 @@ mambo(
 \item{pred.counts}{ASV counts of predictor locus.}
 
 \item{nrep}{number of MAMBO replicates to run.}
+
+\item{num.cores}{number of cores to use for sampling relative percent 
+occurrence. Defaults to value reported by \link[parallel]{detectCores} 
+minus 1.}
 
 \item{bayesian}{logical. Run the Bayesian analysis?}
 

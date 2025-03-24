@@ -4,10 +4,14 @@
 \alias{ranRelPct}
 \title{Random relative percent occurrence}
 \usage{
-ranRelPct(beta.params)
+ranRelPct(beta.params, num.cores = parallel::detectCores() - 1)
 }
 \arguments{
 \item{beta.params}{matrix of beta parameters from \link{betaParams}.}
+
+\item{num.cores}{number of cores to use for sampling relative percent 
+occurrence. Defaults to value reported by \link[parallel]{detectCores} 
+minus 1.}
 }
 \value{
 matrix of random percent occurrences. Rows are ASVs and columns 

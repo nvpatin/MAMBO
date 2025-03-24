@@ -9,3 +9,4 @@ bayesian_results/*
 .idea/*
 *.log
 *.rds
+GOMECC Data/

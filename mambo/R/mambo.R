@@ -6,6 +6,9 @@
 #' @param pred.label label for predictor locus.
 #' @param pred.counts ASV counts of predictor locus.
 #' @param nrep number of MAMBO replicates to run.
+#' @param num.cores number of cores to use for sampling relative percent 
+#'    occurrence. Defaults to value reported by \link[parallel]{detectCores} 
+#'    minus 1.
 #' @param bayesian logical. Run the Bayesian analysis?
 #' @param chains number of MCMC chains.
 #' @param adapt number of adaptation iterations.
@@ -42,6 +45,7 @@ mambo <- function(
     resp.label, resp.counts, 
     pred.label, pred.counts,
     nrep = 10,
+    num.cores = parallel::detectCores() - 1,
     bayesian = TRUE,
     chains = 3,
     adapt = 100,
@@ -94,20 +98,24 @@ mambo <- function(
     # Extract PCs -------------------------------------------------------------
     cat(' ', format(Sys.time()), 'PCA...\n')
     pca <- stats::setNames(
-      list(ranPCA(resp.beta), ranPCA(pred.beta)),
+      list(
+        resp.beta |> 
+          ranPCA(num.cores) |> 
+          impPCs(),
+        pred.beta |> 
+          ranPCA(num.cores) |> 
+          impPCs()
+      ),
       c(resp.label, pred.label)
     )
-    pca[[resp.label]]$num.pcs <- numImpPCs(pca[[resp.label]])
-    pca[[pred.label]]$num.pcs <- numImpPCs(pca[[pred.label]])
     
     post.smry <- p <- NULL
-    
     if(bayesian) {
       # Run Bayesian model ------------------------------------------------------
       cat(' ', format(Sys.time()), 'Bayesian model...\n')
       utils::capture.output(post <- jagsPClm(
-        pc.resp = pca[[resp.label]]$x[, 1:pca[[resp.label]]$num.pcs],
-        pc.preds = pca[[pred.label]]$x[, 1:pca[[pred.label]]$num.pcs],
+        pc.resp = pca[[resp.label]]$x,
+        pc.preds = pca[[pred.label]]$x,
         chains = chains,
         adapt = adapt,
         burnin = burnin,
@@ -124,9 +132,9 @@ mambo <- function(
       dimnames(p$intercept)[[1]] <-
         dimnames(p$b.prime)[[1]] <-
         dimnames(p$w)[[1]] <-
-        dimnames(p$v)[[1]] <- paste0(resp.label, '.PC', 1:pca[[resp.label]]$num.pcs)
+        dimnames(p$v)[[1]] <- paste0(resp.label, '.PC', 1:nrow(p$v))
       dimnames(p$b.prime)[[2]] <-
-        dimnames(p$w)[[2]] <- paste0(pred.label, '.PC', 1:pca[[pred.label]]$num.pcs)
+        dimnames(p$w)[[2]] <- paste0(pred.label, '.PC', 1:ncol(p$w))
     }
     
     end.time <- Sys.time()

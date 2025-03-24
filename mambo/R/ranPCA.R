@@ -4,13 +4,16 @@
 #'   occurrence.
 #'
 #' @param beta.params matrix of beta parameters from \link{betaParams}.
+#' @param num.cores number of cores to use for sampling relative percent 
+#'    occurrence. Defaults to value reported by \link[parallel]{detectCores} 
+#'    minus 1.
 #'
 #' @return summary of PCA from \link{summary.prcomp}.
 #'
 #' @author Eric Archer \email{eric.archer@@noaa.gov}
 #'
-ranPCA <- function(beta.params) {
-  prob <- t(ranRelPct(beta.params))
+ranPCA <- function(beta.params, num.cores = parallel::detectCores() - 1) {
+  prob <- t(ranRelPct(beta.params, num.cores))
   log(prob / (1 - prob)) |>
     stats::prcomp() |>
     summary() |> 

@@ -4,10 +4,14 @@
 \alias{ranPCA}
 \title{Principal component analysis of random draw from beta distribution}
 \usage{
-ranPCA(beta.params)
+ranPCA(beta.params, num.cores = parallel::detectCores() - 1)
 }
 \arguments{
 \item{beta.params}{matrix of beta parameters from \link{betaParams}.}
+
+\item{num.cores}{number of cores to use for sampling relative percent 
+occurrence. Defaults to value reported by \link[parallel]{detectCores} 
+minus 1.}
 }
 \value{
 summary of PCA from \link{summary.prcomp}.
