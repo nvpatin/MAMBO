@@ -9,6 +9,9 @@
 #' @param num.cores number of cores to use for sampling relative percent 
 #'    occurrence. Defaults to value reported by \link[parallel]{detectCores} 
 #'    minus 1.
+#' @param num.resp.pcs,num.pred.pcs maximum number of principal components to 
+#'   retain for response and predictor loci. If \code{NULL}, only components 
+#'   that explain more variance than 1 / number of variables will be retained.
 #' @param bayesian logical. Run the Bayesian analysis?
 #' @param chains number of MCMC chains.
 #' @param adapt number of adaptation iterations.
@@ -46,6 +49,8 @@ mambo <- function(
     pred.label, pred.counts,
     nrep = 10,
     num.cores = parallel::detectCores() - 1,
+    num.resp.pcs = NULL,
+    num.pred.pcs = NULL,
     bayesian = TRUE,
     chains = 3,
     adapt = 100,
@@ -55,134 +60,146 @@ mambo <- function(
     run.label = 'mambo',
     output.log = TRUE
 ) {
+  res <- NULL
   start.time <- Sys.time()
-  if(output.log) {
-    log.fname <- paste0(run.label, '.', format(start.time, '%Y%m%d_%H%M%S.log'))
-    log.file <- file(log.fname, open = 'a')
-    sink(file = log.file, type = 'output', split = TRUE)
-  }
-  
-  cat('\n--------', format(Sys.time()), 'Starting MAMBO --------\n')
-  cat('  Number of replicates:', nrep, '\n')
-  if(bayesian) {
-    cat('  MCMC parameters:\n')
-    cat('    Chains:', chains, '\n')
-    cat('    Adapt:', adapt, '\n')
-    cat('    Burnin:', burnin, '\n')
-    cat('    Total Samples:', total.samples, '\n')
-    cat('    Thinning:', thin, '\n')
-  }
-  if(output.log) cat('  Log file:', log.fname, '\n')
-  
-  cat('\n--------', format(Sys.time()), 'Occurrence Beta parameters --------\n')
-  # compute beta parameter arrays
-  resp.beta <- betaParams(resp.counts)
-  pred.beta <- betaParams(pred.counts)
-  
-  # check that the same sample names are in both datasets
-  if(!setequal(
-    sort(dimnames(resp.beta)[[1]]), 
-    sort(dimnames(pred.beta)[[1]])
-  )) stop("sample names in 'resp.counts' and 'pred.counts' are not the same.")
-  
-  # make sure rows are in same order for both sets of data
-  resp.beta <- resp.beta[dimnames(pred.beta)[[1]], , ]
-  
-  # do nrep iterations, save results to list, and write to RDS file
-  reps <- lapply(1:nrep, function(i) {
-    start.time <- Sys.time()
-    cat('\n-------- Replicate ')
-    cat(i, '/', nrep, sep = '')
-    cat(' --------\n')
-    
-    # Extract PCs -------------------------------------------------------------
-    cat(' ', format(Sys.time()), 'PCA...\n')
-    pca <- stats::setNames(
-      list(
-        resp.beta |> 
-          ranPCA(num.cores) |> 
-          impPCs(),
-        pred.beta |> 
-          ranPCA(num.cores) |> 
-          impPCs()
-      ),
-      c(resp.label, pred.label)
-    )
-    
-    post.smry <- p <- NULL
-    if(bayesian) {
-      # Run Bayesian model ------------------------------------------------------
-      cat(' ', format(Sys.time()), 'Bayesian model...\n')
-      utils::capture.output(post <- jagsPClm(
-        pc.resp = pca[[resp.label]]$x,
-        pc.preds = pca[[pred.label]]$x,
-        chains = chains,
-        adapt = adapt,
-        burnin = burnin,
-        total.samples = total.samples,
-        thin = thin
-      ))
-      
-      # Compute posterior summary statistics ------------------------------------
-      cat(' ', format(Sys.time()), 'Summarize posterior...\n')
-      utils::capture.output(post.smry <- summary(post, silent.jags = TRUE))
-      
-      # Extract posterior and label dimensions -----------------------------------
-      p <- swfscMisc::runjags2list(post)
-      dimnames(p$intercept)[[1]] <-
-        dimnames(p$b.prime)[[1]] <-
-        dimnames(p$w)[[1]] <-
-        dimnames(p$v)[[1]] <- paste0(resp.label, '.PC', 1:nrow(p$v))
-      dimnames(p$b.prime)[[2]] <-
-        dimnames(p$w)[[2]] <- paste0(pred.label, '.PC', 1:ncol(p$w))
+  tryCatch({
+    if(output.log) {
+      log.fname <- paste0(run.label, '.', format(start.time, '%Y%m%d_%H%M%S.log'))
+      log.file <- file(log.fname, open = 'a')
+      sink(file = log.file, type = 'output', split = TRUE)
     }
     
-    end.time <- Sys.time()
-    elapsed <- difftime(end.time, start.time)
-    cat(
-      '  End replicate:', 
-      format(round(swfscMisc::autoUnits(elapsed))),
-      '\n'
+    cat('\n--------', format(Sys.time()), 'Starting MAMBO --------\n')
+    cat('  Number of replicates:', nrep, '\n')
+    if(bayesian) {
+      cat('  MCMC parameters:\n')
+      cat('    Chains:', chains, '\n')
+      cat('    Adapt:', adapt, '\n')
+      cat('    Burnin:', burnin, '\n')
+      cat('    Total Samples:', total.samples, '\n')
+      cat('    Thinning:', thin, '\n')
+    }
+    if(output.log) cat('  Log file:', log.fname, '\n')
+    
+    cat('\n--------', format(Sys.time()), 'Occurrence Beta parameters --------\n')
+    # compute beta parameter arrays
+    resp.beta <- betaParams(resp.counts)
+    pred.beta <- betaParams(pred.counts)
+    
+    # check that the same sample names are in both datasets
+    if(!setequal(
+      sort(dimnames(resp.beta)[[1]]), 
+      sort(dimnames(pred.beta)[[1]])
+    )) stop("sample names in 'resp.counts' and 'pred.counts' are not the same.")
+    
+    # make sure rows are in same order for both sets of data
+    resp.beta <- resp.beta[dimnames(pred.beta)[[1]], , ]
+    
+    # do nrep iterations, save results to list, and write to RDS file
+    reps <- lapply(1:nrep, function(i) {
+      start.time <- Sys.time()
+      cat('\n-------- Replicate ')
+      cat(i, '/', nrep, sep = '')
+      cat(' --------\n')
+      
+      # Extract PCs -------------------------------------------------------------
+      cat(' ', format(Sys.time()), 'PCA...\n')
+      pca <- stats::setNames(
+        list(
+          resp.beta |> 
+            ranPCA(num.cores) |> 
+            impPCs(num.resp.pcs),
+          pred.beta |> 
+            ranPCA(num.cores) |> 
+            impPCs(num.pred.pcs)
+        ),
+        c(resp.label, pred.label)
+      )
+      
+      post.smry <- p <- NULL
+      if(bayesian) {
+        # Run Bayesian model ------------------------------------------------------
+        cat(' ', format(Sys.time()), 'Bayesian model...\n')
+        utils::capture.output(post <- jagsPClm(
+          pc.resp = pca[[resp.label]]$x,
+          pc.preds = pca[[pred.label]]$x,
+          chains = chains,
+          adapt = adapt,
+          burnin = burnin,
+          total.samples = total.samples,
+          thin = thin
+        ))
+        
+        # Compute posterior summary statistics ------------------------------------
+        cat(' ', format(Sys.time()), 'Summarize posterior...\n')
+        utils::capture.output(post.smry <- summary(post, silent.jags = TRUE))
+        
+        # Extract posterior and label dimensions -----------------------------------
+        p <- swfscMisc::runjags2list(post)
+        dimnames(p$intercept)[[1]] <-
+          dimnames(p$b.prime)[[1]] <-
+          dimnames(p$w)[[1]] <-
+          dimnames(p$v)[[1]] <- paste0(resp.label, '.PC', 1:nrow(p$v))
+        dimnames(p$b.prime)[[2]] <-
+          dimnames(p$w)[[2]] <- paste0(pred.label, '.PC', 1:ncol(p$w))
+      }
+      
+      end.time <- Sys.time()
+      elapsed <- difftime(end.time, start.time)
+      cat(
+        '  End replicate:', 
+        format(round(swfscMisc::autoUnits(elapsed))),
+        '\n'
+      )
+      list(pca = pca, post.smry = post.smry, post.list = p)
+    })
+    end.time = Sys.time()
+    
+    res <- list(
+      filename = paste0(run.label, '.', format(start.time, '%Y%m%d_%H%M%S.rds')),
+      labels = c(run = run.label, resp = resp.label, pred = pred.label),
+      params = c(
+        nrep = nrep, chains = chains, adapt = adapt,
+        burnin = burnin, total.samples = total.samples, thin = thin
+      ),
+      run.time = list(
+        start = start.time,
+        end = end.time,
+        elapsed = difftime(end.time, start.time)
+      ),
+      reps = reps
     )
-    list(pca = pca, post.smry = post.smry, post.list = p)
+    saveRDS(res, res$filename)
+    
+    cat('\n--------', format(Sys.time()), 'End MAMBO --------\n')
+    cat('  Number of replicates:', nrep, '\n')
+    if(bayesian) {
+      cat('  MCMC parameters:\n')
+      cat('    Chains:', chains, '\n')
+      cat('    Adapt:', adapt, '\n')
+      cat('    Burnin:', burnin, '\n')
+      cat('    Total Samples:', total.samples, '\n')
+      cat('    Thinning:', thin, '\n')
+    }
+    cat(
+      '  Total elapsed time: ', 
+      format(round(swfscMisc::autoUnits(res$run.time$elapsed), 1)),
+      '\n',
+      sep = ''
+    )
+    cat('  Results saved to:', res$filename, '\n')
+    
+  }, finally = {
+    closeAllConnections()
+    utils::capture.output(gc(verbose = FALSE))
   })
-  end.time = Sys.time()
   
-  res <- list(
-    filename = paste0(run.label, '.', format(start.time, '%Y%m%d_%H%M%S.rds')),
-    labels = c(run = run.label, resp = resp.label, pred = pred.label),
-    params = c(
-      nrep = nrep, chains = chains, adapt = adapt,
-      burnin = burnin, total.samples = total.samples, thin = thin
-    ),
-    run.time = list(
-      start = start.time,
-      end = end.time,
-      elapsed = difftime(end.time, start.time)
-    ),
-    reps = reps
-  )
-  saveRDS(res, res$filename)
-  
-  cat('\n--------', format(Sys.time()), 'End MAMBO --------\n')
-  cat('  Number of replicates:', nrep, '\n')
-  if(bayesian) {
-    cat('  MCMC parameters:\n')
-    cat('    Chains:', chains, '\n')
-    cat('    Adapt:', adapt, '\n')
-    cat('    Burnin:', burnin, '\n')
-    cat('    Total Samples:', total.samples, '\n')
-    cat('    Thinning:', thin, '\n')
-  }
-  cat(
-    '  Total elapsed time: ', 
-    format(round(swfscMisc::autoUnits(res$run.time$elapsed), 1)),
-    '\n',
-    sep = ''
-  )
-  cat('  Results saved to:', res$filename, '\n')
-  
-  closeAllConnections()
-  utils::capture.output(gc(verbose = FALSE))
   invisible(res)
+}
+
+#' @rdname mambo
+#' @export
+#' 
+mamboTutorial <- function() {
+  utils::browseURL(system.file("mambo_Tutorial.html", package = "mambo"))
 }

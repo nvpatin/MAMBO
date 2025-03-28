@@ -2,6 +2,7 @@
 % Please edit documentation in R/mambo.R
 \name{mambo}
 \alias{mambo}
+\alias{mamboTutorial}
 \title{Run MAMBO replicates}
 \usage{
 mambo(
@@ -11,6 +12,8 @@ mambo(
   pred.counts,
   nrep = 10,
   num.cores = parallel::detectCores() - 1,
+  num.resp.pcs = NULL,
+  num.pred.pcs = NULL,
   bayesian = TRUE,
   chains = 3,
   adapt = 100,
@@ -20,6 +23,8 @@ mambo(
   run.label = "mambo",
   output.log = TRUE
 )
+
+mamboTutorial()
 }
 \arguments{
 \item{resp.label}{label for response locus.}
@@ -35,6 +40,10 @@ mambo(
 \item{num.cores}{number of cores to use for sampling relative percent 
 occurrence. Defaults to value reported by \link[parallel]{detectCores} 
 minus 1.}
+
+\item{num.resp.pcs, num.pred.pcs}{maximum number of principal components to 
+retain for response and predictor loci. If \code{NULL}, only components 
+that explain more variance than 1 / number of variables will be retained.}
 
 \item{bayesian}{logical. Run the Bayesian analysis?}
 

@@ -7,7 +7,7 @@
 switchSummary(results, min.p = 0.9, plot = TRUE)
 }
 \arguments{
-\item{results}{output of a \code{mambo} run.}
+\item{results}{output of a \link[mambo]{mambo} run.}
 
 \item{min.p}{minimum proportion of inclusion to highlight a predictor.}
 

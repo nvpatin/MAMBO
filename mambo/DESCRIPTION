@@ -30,4 +30,5 @@ Imports:
   tidyr,
   ggplot2,
   swfscMisc,
-  parallel
+  parallel,
+  tibble

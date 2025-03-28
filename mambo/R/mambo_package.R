@@ -1,18 +1,11 @@
+"_PACKAGE"
+#' @name mambo_package
 #' \code{mambo} package
 #'
 #' Metabarcoding Analysis using Modeled Bayesian Occurrences
-#'
-#' @docType package
-#' @name mambo_package
-#'
-#' @keywords package
 #' 
-#' @export
+#' @keywords internal
 #' 
-mamboTutorial <- function() {
-  utils::browseURL(system.file("mambo_Tutorial.html", package = "mambo"))
-}
-
 .onAttach <- function(libname, pkgname) {
   packageStartupMessage(
     "Welcome to mambo v", utils::packageVersion("mambo"), "\n",

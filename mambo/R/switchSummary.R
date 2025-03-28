@@ -1,7 +1,7 @@
 #' @title Summary of bayesian switches
 #' @description Summarize posterior of predictor switches
 #'
-#' @param results output of a \code{mambo} run.
+#' @param results output of a \link[mambo]{mambo} run.
 #' @param min.p minimum proportion of inclusion to highlight a predictor.
 #' @param plot display summary plot?
 #'

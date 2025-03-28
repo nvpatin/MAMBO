@@ -7,7 +7,7 @@
 pcaList(results)
 }
 \arguments{
-\item{results}{output of a \code{mambo} run.}
+\item{results}{output of a \link[mambo]{mambo} run.}
 }
 \value{
 a list of PCA results by type across all replicates.
