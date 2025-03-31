@@ -1,0 +1,268 @@
+---
+title: "MAMBO vignette"
+output: html_document
+date: "2025-03-24"
+---
+
+## R Markdown
+
+This is a tutorial for running metabarcoding data sets through MAMBO (Metabarcoding Analysis of Modeled Bayesian Occurrences). To run MAMBO, you will need two sets each of 1) ASV tables and 2) taxonomy tables. You may also include an optional metadata file.
+
+The ASV tables should have samples as columns, ASVs as rows, and an empty A1 cell. The cell values should contain raw (untransformed) read counts.
+
+The taxonomy tables should have ASVs as rows and taxonomy ranks in subsequent columns, which each rank in its own column.
+
+```{r libraries}
+library(mambo)
+library(sprex)
+library(dplyr)
+library(ggplot2)
+library(here)
+```
+
+#### Import your ASV tables
+```{r ASV data}
+asv.16s <- read.csv(file=here::here("Data", "ASV tables", "GOMECC",
+                              "GOMECC_16S_ASV_table-V2.csv"),
+                    row.names=1)
+
+asv.18s <- read.csv(file=here::here("Data", "ASV tables", "GOMECC",
+                              "GOMECC_18S_ASV_table.csv"),
+                    row.names=1)
+
+asv.COI <- read.csv(file=here::here("Data", "ASV tables", "Blackman",
+                              "p571_run200121_COI_ASVs.csv"),
+                    row.names=1)
+
+asv.12s <- read.csv(file=here::here("Data", "ASV tables", "Blackman",
+                              "p571_run200218_12S_ASVs.csv"),
+                    row.names=1)
+```
+
+#### Import your taxonomy tables
+```{r tax data}
+tax.16S <- read.csv(file=here::here("Data", "Taxonomy tables", 
+                              "Merged2018_16S_taxa_filtered.csv"))
+
+tax.18s <- read.csv(file=here::here("Data", "Taxonomy tables", 
+                              "Merged2018_18S_taxa_filtered.csv"))
+
+tax <- read.csv(file=here::here("Data", "Taxonomy tables", 
+                              "GOMECC_taxonomy_table.csv"))
+
+tax.COI <- read.csv(file=here::here("Data", "Taxonomy tables", 
+                              "p571_run200121_COI_taxonomy.csv"))
+
+tax.12s <- read.csv(file=here::here("Data", "Taxonomy tables", 
+                              "p571_run200218_12S_taxonomy.csv"))
+```
+
+#### Convert the ASV tables to dataframes and check some basic features of your data
+
+```{r features per sample}
+
+# This is not part of MAMBO, but a preliminary way to get a sense of your data
+
+# filter out empty samples
+asv.16s.counts <- data.frame(Sample = names(asv.16s), 
+                             ASVs = colSums(asv.16s != 0))
+asv.18s.counts <- data.frame(Sample = names(asv.18s), 
+                             ASVs = colSums(asv.18s != 0))
+rownames(asv.16s.counts) <- NULL
+rownames(asv.18s.counts) <- NULL
+
+asv.COI.counts <- data.frame(Sample = names(asv.COI), 
+                             ASVs = colSums(asv.COI != 0))
+asv.12s.counts <- data.frame(Sample = names(asv.12s), 
+                             ASVs = colSums(asv.12s != 0))
+rownames(asv.COI.counts) <- NULL
+rownames(asv.12s.counts) <- NULL
+
+hist.feat <- ggplot(asv.16s.counts, aes(x=ASVs)) +
+  geom_histogram(aes(y=..density..), 
+                 position="identity", binwidth=5)
+
+# samples per feature
+asv.16s.T <- setNames(data.frame(t(asv.16s)),
+                      rownames(asv.16s))
+asv.16s.samps <- data.frame(ASV = names(asv.16s.T), 
+                             Samples = colSums(asv.16s.T != 0))
+rownames(asv.16s.samps) <- NULL
+
+hist.samp <- ggplot(asv.16s.samps, aes(x=Samples)) +
+  geom_histogram(aes(y=..density..), 
+                 position="identity", binwidth=5)
+
+```
+
+#### Run MAMBO and check the labels
+```{r mambo}
+
+# Convert the tables to data frames
+asv.16s.df <- data.frame(asv.16s)
+asv.18s.df <- data.frame(asv.18s)
+
+# Optional filtering step to reduce data size
+asv.16s.filt <- filterCountData(asv.16s)
+asv.18s.filt <- filterCountData(asv.18s)
+
+# Run MAMBO on filtered data
+result <- mambo(
+  resp.label = '18s',
+  resp.counts = asv.18s.filt,
+  pred.label = '16s',
+  pred.counts = asv.16s.filt,
+  nrep=10,
+  chains=3,
+  adapt=100,
+  burnin=1000,
+  total.samples=1000,
+  thin=1,
+  run.label="mambo",
+  output.log=TRUE
+)
+
+result$labels
+
+pcaSummary(result)
+```
+#### To specify the number of PCs to be used in the Bayesian modeling, use the num.resp.pcs and num.pred.pcs parameters
+```{r mambo}
+
+result <- mambo(
+  resp.label = '18s',
+  resp.counts = asv.18s.filt,
+  pred.label = '16s',
+  pred.counts = asv.16s.filt,
+  nrep=100,
+  chains=3,
+  adapt=100,
+  burnin=1000,
+  total.samples=1000,
+  num.resp.pcs=5,
+  num.pred.pcs=10,
+  thin=1,
+  run.label="mambo",
+  output.log=TRUE
+)
+
+result$labels
+
+pcaSummary(result)
+```
+
+#### To skip the modeling and just run the PCAs, set Bayesian=FALSE
+```{r mambo}
+
+result <- mambo(
+  resp.label = '18s',
+  resp.counts = asv.18s,
+  pred.label = '16s',
+  pred.counts = asv.16s,
+  nrep=10,
+  chains=3,
+  adapt=100,
+  burnin=1000,
+  total.samples=1000,
+  thin=1,
+  run.label="mambo",
+  bayesian=FALSE,
+  output.log=TRUE
+)
+
+result$labels
+```
+
+#### Check the results of the first replicate
+
+```{r results}
+
+# Need those '``' 
+result$reps[[1]]$pca$`16s`
+
+result$reps[[1]]$pca$`18s`
+```
+#### Plot the summary of sign switching
+```{r signs}
+
+# This one didn't work for me
+mambo:::switchSummary(result)
+```
+
+### Plot the PCAs for each marker gene ("locus")
+```{r PCA}
+
+# default
+p16s <- plotPCs(result, "16s", pc.x=1, pc.y=2, type="ellipse")
+
+# with confidence ellipses
+p16s <- plotPCs(result, "16s", pc.x=1, pc.y=2, type="density")
+```
+
+```{r PCA}
+
+# default
+p18s <- plotPCs(result, "18s", pc.x=1, pc.y=2, type="ellipse")
+
+# with confidence ellipses
+p18s <- plotPCs(result, "18s", pc.x=1, pc.y=2, type="density")
+```
+
+#### Check which ASVs are outliers, ie driving the separations (PC1 only in this example)
+```{r outliers}
+
+outliers.16s.pc1 <- outlierLoadings(result, 
+                                    locus = '16s', 
+                                    pc = 1)
+
+outliers.18s.pc1 <- outlierLoadings(result, 
+                                    '18s', 
+                                    pc = 1)
+
+head(outliers.16s.pc1)
+```
+
+### Extract PC scores
+```{r scores}
+
+scores.16s <- extractPCA(result)$scores[['16s']]
+scores.18s <- extractPCA(result)$scores[['18s']]
+```
+
+#### Identify taxonomy of outlier ASVs
+```{r tax}
+
+# Add column name to match ASV tibble column name if it doesn't already
+colnames(tax)[1] <- "asv"
+colnames(tax.16S)[1] <- "asv"
+colnames(tax.18s)[1] <- "asv"
+
+# Merge the tibbles (PC1 only)
+asvs_out_16S_tax <- left_join(outliers.16s.pc1, tax,
+                              by="asv")
+asvs_out_18S_tax <- left_join(outliers.18s.pc1, tax, 
+                              by="asv")
+
+head(asvs_out_16S_tax)
+```
+
+#### Save files to csv
+```{r save}
+write.csv(asvs_out_16S_tax, "GOMECC_16S_PC1_outlier_ASVs.csv", 
+          row.names=FALSE)
+write.csv(asvs_out_18S_tax, "GOMECC_18S_PC1_outlier_ASVs.csv", 
+          row.names=FALSE)
+
+write.csv(scores.16s, "GOMECC_16S_PCA_scores.csv",
+          row.names=FALSE)
+
+write.csv(scores.18s, "GOMECC_18S_PCA_scores.csv",
+          row.names=FALSE)
+```
+
+#### If you have an existing MAMBO output saved as a .rds file, you can import it and extract the existing data
+
+```{r import rds}
+file = here::here("mambo.20250324_222435.rds")
+gomecc = readRDS(file)
+```
