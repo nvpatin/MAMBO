@@ -1,0 +1,97 @@
+---
+title: "MAMBO_CCE_metadata"
+output: html_document
+date: "2025-03-24"
+---
+
+This script assumes you exported the PC scores and metadata to .csv files after running MAMBO.
+
+#### Load libraries
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(here)
+```
+
+#### Import MAMBO output
+
+```{r scores}
+
+scores.16S <- read.csv(file=here::here("Data", "Outputs", 
+                                       "CCE_16S_PCA_scores.csv")) # row.names=1
+
+scores.18S <- read.csv(file=here::here("Data", "Outputs", 
+                                       "CCE_18S_PCA_scores.csv"))
+```
+
+#### Import metadata
+
+```{r}
+meta.16S <- read.csv(file=here::here("Data", "Metadata",
+                                    "Merged2018_16S_meta_filtered.csv"))
+meta.16S <- meta.16S %>% rename(sample.ID = sample_name)
+                     
+meta.18S <- read.csv(file=here::here("Data", "Metadata",
+                                    "Merged2018_18S_meta_filtered.csv"))
+meta.18S <- meta.18S %>% rename(sample.ID = sample_name)
+
+glimpse(meta.16S)
+```
+
+Create tibble of every PC score by sample
+
+```{r tibble}
+
+# Reformat the scores
+pc.x = 1
+pc.y = 2
+ellipse.p = 0.95
+
+pc_scores.16S <- purrr::imap(split(scores.16S, scores.16S$sample), function(df, i) {
+  x <- dplyr::filter(df, pc == pc.x)$score
+  y <- dplyr::filter(df, pc == pc.y)$score
+  car::dataEllipse(x, y, levels = ellipse.p, draw = FALSE) |> 
+    as.data.frame() |> 
+    dplyr::mutate(sample = i)
+})|> 
+  dplyr::bind_rows() %>% rename(sample.ID = sample)
+
+pc_scores.18S <- purrr::imap(split(scores.18S, scores.18S$sample), function(df, i) {
+  x <- dplyr::filter(df, pc == pc.x)$score
+  y <- dplyr::filter(df, pc == pc.y)$score
+  car::dataEllipse(x, y, levels = ellipse.p, draw = FALSE) |> 
+    as.data.frame() |> 
+    dplyr::mutate(sample = i)
+})|> 
+  dplyr::bind_rows() %>% rename(sample.ID = sample)
+
+glimpse(pc_scores.16S)
+```
+
+Use metadata categories as groups to plot
+
+```{r}
+# join metadata with PC scores
+df.16S <- meta.16S %>%
+  right_join(pc_scores.16S)
+
+df.18S <- meta.18S %>%
+  right_join(pc_scores.18S)
+
+# season
+p <- df.16S %>%
+  ggplot2::ggplot(aes(fill=season)) +
+  ggplot2::geom_hline(yintercept = 0, color = 'darkred') +
+  ggplot2::geom_vline(xintercept = 0, color = 'darkred') +
+  ggplot2::geom_polygon(
+    ggplot2::aes(x, y, group = sample.ID),
+    alpha=0.7,
+    color = 'black'
+  ) +
+  ggplot2::labs(
+    x = paste0('PC', pc.x),
+    y = paste0('PC', pc.y)
+  ) +
+  ggplot2::theme_minimal()
+```
