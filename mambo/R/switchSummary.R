@@ -17,7 +17,7 @@ switchSummary <- function(results, min.p = 0.9, plot = TRUE) {
 
   min.pcs <- results$reps |>
     sapply(function(x) {
-      sapply(x$pca, function(pca.x) pca.x$num.pcs)
+      sapply(x$pca, function(pca.x) ncol(pca.x$x))
     }) |>
     apply(1, min)
 

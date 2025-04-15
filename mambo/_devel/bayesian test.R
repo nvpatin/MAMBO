@@ -15,14 +15,20 @@ resp.counts <- read.csv('GOMECC Data/GOMECC_18S_ASV_table.csv') |>
 resp.label <- '18s'
 
 result <- mambo(
-  resp.label = resp.label,
+  resp.label = '18s',
   resp.counts = resp.counts,
-  pred.label = pred.label,
+  pred.label = '16s',
   pred.counts = pred.counts,
-  num.resp.pcs = 5,
-  num.pred.pcs = 5,
-  nrep = 10,
-  chains = 10
+  nrep=100,
+  chains=3,
+  adapt=100,
+  burnin=1000,
+  total.samples=1000,
+  num.resp.pcs=5,
+  num.pred.pcs=10,
+  thin=1,
+  run.label="mambo",
+  output.log=TRUE
 )
 
-x <- pcaSummary(result)
+pcaSummary(result)

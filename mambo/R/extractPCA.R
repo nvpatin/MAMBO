@@ -42,7 +42,7 @@ extractPCA <- function(results) {
   
   scores <- lapply(pca.list, function(rep) {
     min.pcs <- min(sapply(rep$x, function(x) dim(x)[2]))
-    sc <- lapply(rep$x, function(x) x[1:min.pcs, 1:min.pcs])
+    sc <- lapply(rep$x, function(x) x[, 1:min.pcs])
     res <- abind::abind(sc, along = 3) |> 
       apply(2, .switchSigns, simplify = FALSE) |> 
       abind::abind(along = 3) |> 
