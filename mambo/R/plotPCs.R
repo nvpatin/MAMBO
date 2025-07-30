@@ -35,8 +35,8 @@ plotPCs <- function(results, locus, pc.x = 1, pc.y = 2,
     scores |> 
       split(scores$sample) |> 
       purrr::imap(function(df, i) {
-        x <- dplyr::filter(df, pc == pc.x)$score
-        y <- dplyr::filter(df, pc == pc.y)$score
+        x <- dplyr::filter(df, .data$pc == pc.x)$score
+        y <- dplyr::filter(df, .data$pc == pc.y)$score
         car::dataEllipse(x, y, levels = ellipse.p, draw = FALSE) |> 
           as.data.frame() |> 
           dplyr::mutate(sample = i)
@@ -44,8 +44,8 @@ plotPCs <- function(results, locus, pc.x = 1, pc.y = 2,
       dplyr::bind_rows()
   } else {
     scores |> 
-      dplyr::mutate(axis = ifelse(pc == pc.x, 'x', 'y')) |> 
-      dplyr::filter(pc %in% c(pc.x, pc.y)) |> 
+      dplyr::mutate(axis = ifelse(.data$pc == pc.x, 'x', 'y')) |> 
+      dplyr::filter(.data$pc %in% c(pc.x, pc.y)) |> 
       dplyr::select(-dplyr::all_of('pc')) |> 
       tidyr::pivot_wider(
         id_cols = c('sample', 'rep'), 
@@ -55,7 +55,7 @@ plotPCs <- function(results, locus, pc.x = 1, pc.y = 2,
   }
     
   gg <- df |> 
-    ggplot2::ggplot(mapping = ggplot2::aes(x = x, y = y)) +
+    ggplot2::ggplot(mapping = ggplot2::aes(x = .data$x, y = .data$y)) +
     ggplot2::geom_hline(yintercept = 0, color = 'darkred') +
     ggplot2::geom_vline(xintercept = 0, color = 'darkred') +
     ggplot2::labs(

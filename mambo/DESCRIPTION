@@ -31,4 +31,5 @@ Imports:
   ggplot2,
   swfscMisc,
   parallel,
+  rlang (>= 0.4.10),
   tibble
