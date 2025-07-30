@@ -31,12 +31,13 @@ extractPCA <- function(results) {
       abind::abind(along = 3) |> 
       aperm(c(1, 3, 2))
     dimnames(res)[[3]] <- 1:dim(res)[3]
-    as.data.frame.table(res) |> 
+    res |> 
+      as.data.frame.table() |> 
       stats::setNames(c('asv', 'pc', 'rep', 'loading')) |> 
       dplyr::mutate(
-        asv = as.character(asv),
-        pc = as.numeric(gsub('PC', '', pc)),
-        rep = as.numeric(rep)
+        asv = as.character(.data$asv),
+        pc = as.numeric(gsub('PC', '', .data$pc)),
+        rep = as.numeric(.data$rep)
       )
   })
   
@@ -48,12 +49,13 @@ extractPCA <- function(results) {
       abind::abind(along = 3) |> 
       aperm(c(1, 3, 2))
     dimnames(res)[[3]] <- 1:dim(res)[3]
-    as.data.frame.table(res) |> 
+    res |> 
+      as.data.frame.table() |> 
       stats::setNames(c('sample', 'pc', 'rep', 'score')) |> 
       dplyr::mutate(
-        sample = as.character(sample),
-        pc = as.numeric(gsub('PC', '', pc)),
-        rep = as.numeric(rep)
+        sample = as.character(.data$sample),
+        pc = as.numeric(gsub('PC', '', .data$pc)),
+        rep = as.numeric(.data$rep)
       )
   })
   

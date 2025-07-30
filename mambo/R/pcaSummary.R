@@ -18,5 +18,5 @@ pcaSummary <- function(results) {
       as.data.frame() |> 
       tibble::rownames_to_column('locus') 
   }) |> 
-    bind_rows()
+    dplyr::bind_rows()
 }
