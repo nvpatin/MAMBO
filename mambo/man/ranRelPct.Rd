@@ -4,7 +4,7 @@
 \alias{ranRelPct}
 \title{Random relative percent occurrence}
 \usage{
-ranRelPct(beta.params, num.cores = parallel::detectCores() - 1)
+ranRelPct(beta.params, num.cores = parallel::detectCores(logical = FALSE) - 1)
 }
 \arguments{
 \item{beta.params}{matrix of beta parameters from \link{betaParams}.}

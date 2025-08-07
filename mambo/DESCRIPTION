@@ -32,4 +32,5 @@ Imports:
   swfscMisc,
   parallel,
   rlang (>= 0.4.10),
+  sprex,
   tibble

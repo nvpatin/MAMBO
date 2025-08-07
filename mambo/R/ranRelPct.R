@@ -11,15 +11,15 @@
 #'
 #' @author Eric Archer \email{eric.archer@@noaa.gov}
 #' 
-ranRelPct <- function(beta.params, num.cores = parallel::detectCores() - 1) {
+ranRelPct <- function(beta.params, num.cores = parallel::detectCores(logical = FALSE) - 1) {
   param.dim <- dim(beta.params)[1:2]
   # draw random sample from beta distribution with shape parameters 'p'
   pct <- parallel::mclapply(1:prod(param.dim), function(i) {
     inds <- arrayInd(i, param.dim)
     p <- beta.params[inds[1], inds[2], ]
     stats::rbeta(1, p[1], p[2])
-  }, mc.cores = num.cores) |> 
-    unlist() |> 
+  }, mc.cores = num.cores) |>
+    unlist() |>
     array(dim = param.dim)
   
   # normalize random percents to unity and return matrix

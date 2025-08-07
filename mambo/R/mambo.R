@@ -102,15 +102,30 @@ mambo <- function(
       cat(i, '/', nrep, sep = '')
       cat(' --------\n')
       
+      # Draw sample of relative abundance ---------------------------------------
+      cat(' ', format(Sys.time()), 'Relative abundance draw...\n')
+      resp.abund <- ranRelPct(resp.beta, num.cores)
+      pred.abund <- ranRelPct(pred.beta, num.cores)
+      
+      # Diversity ---------------------------------------------------------------
+      cat(' ', format(Sys.time()), 'Diversity...\n')
+      diversity <- cbind(
+        sprex::diversity(resp.abund),
+        sprex::diversity(pred.abund)
+      ) |> 
+        as.data.frame() |> 
+        stats::setNames(c(resp.label, pred.label)) |> 
+        tibble::rownames_to_column('sample')
+      
       # Extract PCs -------------------------------------------------------------
       cat(' ', format(Sys.time()), 'PCA...\n')
       pca <- stats::setNames(
         list(
-          resp.beta |> 
-            ranPCA(num.cores) |> 
+          resp.abund |> 
+            ranPCA() |> 
             impPCs(num.resp.pcs),
-          pred.beta |> 
-            ranPCA(num.cores) |> 
+          pred.abund |> 
+            ranPCA() |> 
             impPCs(num.pred.pcs)
         ),
         c(resp.label, pred.label)
@@ -151,7 +166,7 @@ mambo <- function(
         format(round(swfscMisc::autoUnits(elapsed))),
         '\n'
       )
-      list(pca = pca, post.smry = post.smry, post.list = p)
+      list(diversity = diversity, pca = pca, post.smry = post.smry, post.list = p)
     })
     end.time = Sys.time()
     

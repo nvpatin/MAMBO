@@ -4,21 +4,17 @@
 \alias{ranPCA}
 \title{Principal component analysis of random draw from beta distribution}
 \usage{
-ranPCA(beta.params, num.cores = parallel::detectCores() - 1)
+ranPCA(rel.abund)
 }
 \arguments{
-\item{beta.params}{matrix of beta parameters from \link{betaParams}.}
-
-\item{num.cores}{number of cores to use for sampling relative percent 
-occurrence. Defaults to value reported by \link[parallel]{detectCores} 
-minus 1.}
+\item{rel.abund}{matrix of relative abundance expressed as percents of 
+read counts (\code{0:1}). Columns are samples, rows are ASVs.}
 }
 \value{
-summary of PCA from \link{summary.prcomp}.
+Summary of PCA from \link{summary.prcomp}.
 }
 \description{
-Conducts a random draw of relative percent occurrence from 
-  beta distribution. Then does a PCA of the log-odds of the relative percent
+Computes a PCA of the log-odds of the relative percent
   occurrence.
 }
 \author{
