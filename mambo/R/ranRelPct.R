@@ -9,7 +9,7 @@
 #' @return matrix of random percent occurrences. Rows are ASVs and columns 
 #'   are samples.
 #'
-#' @author Eric Archer \email{eric.archer@@noaa.gov}
+#' @author Eric Archer \email{eric.ivan.archer@@gmail.com}
 #' 
 ranRelPct <- function(beta.params, num.cores = parallel::detectCores(logical = FALSE) - 1) {
   param.dim <- dim(beta.params)[1:2]

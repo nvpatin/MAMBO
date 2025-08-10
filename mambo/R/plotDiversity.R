@@ -15,7 +15,7 @@
 #' the plot by.
 #' @param plot display plot?
 #'
-#' @author Eric Archer \email{eric.archer@@noaa.gov}
+#' @author Eric Archer \email{eric.ivan.archer@@gmail.com}
 #'
 #' @export
 #'
@@ -72,13 +72,17 @@ plotDiversity <- function(results, type = c('ellipse', 'density'),
   
   gg <- if(type == 'ellipse') {
     if(!is.null(ellipse.fill)) {
-      gg + ggplot2::geom_polygon(
+      x <- gg + ggplot2::geom_polygon(
         ggplot2::aes(group = .data$sample, fill = .data[[ellipse.fill]]),
         alpha = 0.75,
         color = 'black'
-      ) +
-        ggplot2::scale_fill_viridis_c(option = 'viridis') +
-        ggplot2::theme(legend.position = 'top')
+      ) 
+      if(is.numeric(df[[ellipse.fill]])) {
+        x <- x + ggplot2::scale_fill_viridis_c(option = 'viridis')
+      } else {
+        x <- x + ggplot2::scale_fill_brewer(palette = 'Set2')
+      }
+      x + ggplot2::theme(legend.position = 'top')
     } else {
       gg + ggplot2::geom_polygon(
         ggplot2::aes(group = .data$sample), 

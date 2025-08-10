@@ -18,5 +18,5 @@ Computes a PCA of the log-odds of the relative percent
   occurrence.
 }
 \author{
-Eric Archer \email{eric.archer@noaa.gov}
+Eric Archer \email{eric.ivan.archer@gmail.com}
 }

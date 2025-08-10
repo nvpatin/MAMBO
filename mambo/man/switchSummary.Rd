@@ -31,5 +31,5 @@ a list with a summary table and plot object.
 Summarize posterior of predictor switches
 }
 \author{
-Eric Archer \email{eric.archer@noaa.gov}
+Eric Archer \email{eric.ivan.archer@gmail.com}
 }

@@ -21,5 +21,5 @@ matrix of random percent occurrences. Rows are ASVs and columns
 Random sample of percent occurrence from beta parameters.
 }
 \author{
-Eric Archer \email{eric.archer@noaa.gov}
+Eric Archer \email{eric.ivan.archer@gmail.com}
 }

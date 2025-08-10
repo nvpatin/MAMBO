@@ -30,5 +30,5 @@ Run a bayesian linear model with principal component response
   and predictors in JAGS.
 }
 \author{
-Eric Archer \email{eric.archer@noaa.gov}
+Eric Archer \email{eric.ivan.archer@gmail.com}
 }

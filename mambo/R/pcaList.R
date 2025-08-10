@@ -5,7 +5,7 @@
 #'
 #' @return a list of PCA results by type across all replicates.
 #'
-#' @author Eric Archer \email{eric.archer@@noaa.gov}
+#' @author Eric Archer \email{eric.ivan.archer@@gmail.com}
 #'
 #' @export
 #'

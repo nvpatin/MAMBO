@@ -4,7 +4,7 @@
 #'
 #' @param results output of a \link[mambo]{mambo} run.
 #'
-#' @author Eric Archer \email{eric.archer@@noaa.gov}
+#' @author Eric Archer \email{eric.ivan.archer@@gmail.com}
 #' 
 #' @export
 #'

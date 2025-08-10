@@ -7,7 +7,7 @@
 #'
 #' @return Summary of PCA from \link{summary.prcomp}.
 #'
-#' @author Eric Archer \email{eric.archer@@noaa.gov}
+#' @author Eric Archer \email{eric.ivan.archer@@gmail.com}
 #'
 ranPCA <- function(rel.abund) {
   prob <- t(rel.abund)

@@ -11,7 +11,7 @@
 #' @param min.pct.reps minimum percent of replicates that an ASV should be 
 #'   identified as an outlier in to be saved.
 #'
-#' @author Eric Archer \email{eric.archer@@noaa.gov}
+#' @author Eric Archer \email{eric.ivan.archer@@gmail.com}
 #'
 #' @export
 #'

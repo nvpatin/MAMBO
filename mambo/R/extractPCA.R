@@ -6,7 +6,7 @@
 #' @return a list with a data frame of component loadings (\code{$loadings}) and scores
 #'   (\code{$scores}) for each locus.
 #'
-#' @author Eric Archer \email{eric.archer@@noaa.gov}
+#' @author Eric Archer \email{eric.ivan.archer@@gmail.com}
 #'
 #' @export
 #'

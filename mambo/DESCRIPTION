@@ -14,7 +14,7 @@ Description: A program to analyze eDNA metabarcoding sequence data from
   Created for the 2023 NOAA/NCAR Hackathon, part of the Open Hackathons program.
 Version: 0.1.0
 Authors@R: c(
-  EA = person("Eric", "Archer", email = "eric.archer@noaa.gov", role = c("aut", "cre")))
+  EA = person("Eric", "Archer", email = "eric.ivan.archer@gmail.com", role = c("aut", "cre")))
 LazyData: TRUE
 License: GPL (>= 2)
 Encoding: UTF-8

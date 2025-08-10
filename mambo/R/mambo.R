@@ -40,7 +40,7 @@
 #'   \item{\code{$post.list}}{list of posterior distribution for each parameter in the model.}
 #' }
 #'
-#' @author Eric Archer \email{eric.archer@@noaa.gov}
+#' @author Eric Archer \email{eric.ivan.archer@@gmail.com}
 #'
 #' @export
 #'

@@ -7,6 +7,6 @@ result <- mambo(
   resp.counts = counts.18s, 
   pred.label = '16s', 
   pred.counts = counts.16s, 
-  nrep = 10, 
+  nrep = 50, 
   bayesian = FALSE
 )

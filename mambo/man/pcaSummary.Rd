@@ -14,5 +14,5 @@ Number of components retained and distribution of cumulative
   proportion of variance for by locus.
 }
 \author{
-Eric Archer \email{eric.archer@noaa.gov}
+Eric Archer \email{eric.ivan.archer@gmail.com}
 }

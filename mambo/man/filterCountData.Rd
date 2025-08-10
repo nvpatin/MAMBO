@@ -32,5 +32,5 @@ matrix of count data with filters applied.
 Remove ASVs or samples with low frequencies or read counts.
 }
 \author{
-Eric Archer \email{eric.archer@noaa.gov}
+Eric Archer \email{eric.ivan.archer@gmail.com}
 }

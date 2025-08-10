@@ -20,5 +20,5 @@ a three dimensional array where the first dimension are the samples,
 Fits shape paraemters of beta distribution to ASV occurrence data.
 }
 \author{
-Eric Archer \email{eric.archer@noaa.gov}
+Eric Archer \email{eric.ivan.archer@gmail.com}
 }

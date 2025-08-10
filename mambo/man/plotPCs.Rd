@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotPCs.R
 \name{plotPCs}
 \alias{plotPCs}
-\title{Plot principal component confidence ellipses}
+\title{Plot principal component scores with replicate uncertainty}
 \usage{
 plotPCs(
   results,
@@ -38,7 +38,8 @@ plotPCs(
 called '\code{sample}' identifying samples in \code{locus}.}
 
 \item{ellipse.fill}{a column in the \code{sample.df} data frame to use to 
-color in ellipses.}
+color in ellipses. If this column is a \code{numeric} it is treated as a
+continuous variable, otherwise it is treated as discrete.}
 
 \item{facet.by}{a column in the \code{sample.df} data frame to use to facet 
 the plot by.}
@@ -46,11 +47,12 @@ the plot by.}
 \item{plot}{display plot?}
 }
 \value{
-PCA biplot of scores with confidence ellipses for each sample.
+\code{ggplot2} PCA biplot of scores.
 }
 \description{
-Plot principal component confidence ellipses from multiple replicates
+Plot principal component scores as ellipses or 2-D densities
+from multiple \code{MAMBO} replicates.
 }
 \author{
-Eric Archer \email{eric.archer@noaa.gov}
+Eric Archer \email{eric.ivan.archer@gmail.com}
 }

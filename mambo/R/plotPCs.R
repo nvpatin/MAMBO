@@ -1,5 +1,6 @@
-#' @title Plot principal component confidence ellipses
-#' @description Plot principal component confidence ellipses from multiple replicates
+#' @title Plot principal component scores with replicate uncertainty
+#' @description Plot principal component scores as ellipses or 2-D densities
+#' from multiple \code{MAMBO} replicates.
 #'
 #' @param results output of a \code{mambo} run.
 #' @param locus label name of response or predictor locus.
@@ -12,14 +13,15 @@
 #' (\code{ellipse.fill}) or facet by (\code{facet.by}). Must have a column 
 #' called '\code{sample}' identifying samples in \code{locus}.
 #' @param ellipse.fill a column in the \code{sample.df} data frame to use to 
-#' color in ellipses.
+#' color in ellipses. If this column is a \code{numeric} it is treated as a
+#' continuous variable, otherwise it is treated as discrete.
 #' @param facet.by a column in the \code{sample.df} data frame to use to facet 
 #' the plot by.
 #' @param plot display plot?
 #'
-#' @return PCA biplot of scores with confidence ellipses for each sample.
+#' @return \code{ggplot2} PCA biplot of scores.
 #'
-#' @author Eric Archer \email{eric.archer@@noaa.gov}
+#' @author Eric Archer \email{eric.ivan.archer@@gmail.com}
 #'
 #' @export
 #'
@@ -92,13 +94,17 @@ plotPCs <- function(results, locus, pc.x = 1, pc.y = 2,
   
   gg <- if(type == 'ellipse') {
     if(!is.null(ellipse.fill)) {
-      gg + ggplot2::geom_polygon(
+      x <- gg + ggplot2::geom_polygon(
         ggplot2::aes(group = .data$sample, fill = .data[[ellipse.fill]]),
         alpha = 0.75,
         color = 'black'
-      ) +
-        ggplot2::scale_fill_viridis_c(option = 'viridis') +
-        ggplot2::theme(legend.position = 'top')
+      ) 
+      if(is.numeric(df[[ellipse.fill]])) {
+        x <- x + ggplot2::scale_fill_viridis_c(option = 'viridis')
+      } else {
+        x <- x + ggplot2::scale_fill_brewer(palette = 'Set2')
+      }
+      x + ggplot2::theme(legend.position = 'top')
     } else {
       gg + ggplot2::geom_polygon(
         ggplot2::aes(group = .data$sample), 

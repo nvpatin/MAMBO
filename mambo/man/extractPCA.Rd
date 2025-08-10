@@ -17,5 +17,5 @@ a list with a data frame of component loadings (\code{$loadings}) and scores
 Extract principal component loadings and scores.
 }
 \author{
-Eric Archer \email{eric.archer@noaa.gov}
+Eric Archer \email{eric.ivan.archer@gmail.com}
 }

@@ -41,5 +41,5 @@ Plot diversity (effective number of ASVs) for predictor and
 response loci
 }
 \author{
-Eric Archer \email{eric.archer@noaa.gov}
+Eric Archer \email{eric.ivan.archer@gmail.com}
 }

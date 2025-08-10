@@ -11,7 +11,7 @@
 #'
 #' @return a list with a summary table and plot object.
 #'
-#' @author Eric Archer \email{eric.archer@@noaa.gov}
+#' @author Eric Archer \email{eric.ivan.archer@@gmail.com}
 #'
 #' @export
 #'
