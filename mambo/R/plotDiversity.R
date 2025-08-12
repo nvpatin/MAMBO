@@ -13,6 +13,7 @@
 #' color in ellipses.
 #' @param facet.by a column in the \code{sample.df} data frame to use to facet 
 #' the plot by.
+#' @param log.axes log-scale axes?
 #' @param plot display plot?
 #'
 #' @author Eric Archer \email{eric.ivan.archer@@gmail.com}
@@ -21,7 +22,8 @@
 #'
 plotDiversity <- function(results, type = c('ellipse', 'density'), 
                           ellipse.p = 0.95, num.bins = 50, sample.df = NULL, 
-                          ellipse.fill = NULL, facet.by = NULL, plot = TRUE) {
+                          ellipse.fill = NULL, facet.by = NULL, log.axes = TRUE,
+                          plot = TRUE) {
   if(!is.null(ellipse.fill)) {
     if(!ellipse.fill %in% names(sample.df)) {
       stop("'", ellipse.fill, "' not in 'sample.df'")
@@ -35,7 +37,7 @@ plotDiversity <- function(results, type = c('ellipse', 'density'),
   }
 
   df <- results$reps |> 
-    lapply(function(x) x$diversity) |> 
+    lapply(function(x) x$sample.diversity) |> 
     dplyr::bind_rows()
   
   pred <- results$labels['pred']
@@ -95,6 +97,12 @@ plotDiversity <- function(results, type = c('ellipse', 'density'),
       ggplot2::geom_bin_2d(bins = num.bins) +
       ggplot2::scale_fill_viridis_c(option = 'viridis') +
       ggplot2::theme(legend.position = 'none')
+  }
+  
+  if(log.axes) {
+    gg <- gg +
+      ggplot2::scale_x_log10() +
+      ggplot2::scale_y_log10()
   }
     
   if(!is.null(facet.by)) gg <- gg + ggplot2::facet_wrap(~ .data[[facet.by]], ncol = 1)

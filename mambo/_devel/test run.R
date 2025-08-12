@@ -1,6 +1,5 @@
 rm(list = ls())
 library(mambo)
-library(tidyverse)
 
 result <- mambo(
   resp.label = '18s', 

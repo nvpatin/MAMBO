@@ -12,6 +12,7 @@ plotDiversity(
   sample.df = NULL,
   ellipse.fill = NULL,
   facet.by = NULL,
+  log.axes = TRUE,
   plot = TRUE
 )
 }
@@ -33,6 +34,8 @@ color in ellipses.}
 
 \item{facet.by}{a column in the \code{sample.df} data frame to use to facet 
 the plot by.}
+
+\item{log.axes}{log-scale axes?}
 
 \item{plot}{display plot?}
 }

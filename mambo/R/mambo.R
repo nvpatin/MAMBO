@@ -109,7 +109,12 @@ mambo <- function(
       
       # Diversity ---------------------------------------------------------------
       cat(' ', format(Sys.time()), 'Diversity...\n')
-      diversity <- cbind(
+      total.diversity <- stats::setNames(
+        c(sprex::diversity(rowSums(resp.abund)), sprex::diversity(rowSums(pred.abund))),
+        c(resp.label, pred.label)
+      )
+      
+      sample.diversity <- cbind(
         sprex::diversity(resp.abund),
         sprex::diversity(pred.abund)
       ) |> 
@@ -166,7 +171,13 @@ mambo <- function(
         format(round(swfscMisc::autoUnits(elapsed))),
         '\n'
       )
-      list(diversity = diversity, pca = pca, post.smry = post.smry, post.list = p)
+      list(
+        total.diversity = total.diversity,
+        sample.diversity = sample.diversity, 
+        pca = pca, 
+        post.smry = post.smry, 
+        post.list = p
+      )
     })
     end.time = Sys.time()
     
