@@ -16,5 +16,5 @@ a list of PCA results by type across all replicates.
 Extract transposed list of all PCA results.
 }
 \author{
-Eric Archer \email{eric.archer@noaa.gov}
+Eric Archer \email{eric.ivan.archer@gmail.com}
 }

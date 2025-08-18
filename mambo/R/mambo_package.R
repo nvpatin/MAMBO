@@ -5,6 +5,7 @@
 #' Metabarcoding Analysis using Modeled Bayesian Occurrences
 #' 
 #' @keywords internal
+#' @importFrom rlang .data
 #' 
 .onAttach <- function(libname, pkgname) {
   packageStartupMessage(

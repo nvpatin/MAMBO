@@ -10,7 +10,7 @@
 #'   elements with only important components or \code{n.pcs}, 
 #'   whichever is smaller.
 #'
-#' @author Eric Archer \email{eric.archer@@noaa.gov}
+#' @author Eric Archer \email{eric.ivan.archer@@gmail.com}
 #'
 impPCs <- function(pca, num.pcs = NULL) {
   # number of important PCs = as many as account for expected variance

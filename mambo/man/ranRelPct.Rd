@@ -4,7 +4,7 @@
 \alias{ranRelPct}
 \title{Random relative percent occurrence}
 \usage{
-ranRelPct(beta.params, num.cores = parallel::detectCores() - 1)
+ranRelPct(beta.params, num.cores = parallel::detectCores(logical = FALSE) - 1)
 }
 \arguments{
 \item{beta.params}{matrix of beta parameters from \link{betaParams}.}
@@ -21,5 +21,5 @@ matrix of random percent occurrences. Rows are ASVs and columns
 Random sample of percent occurrence from beta parameters.
 }
 \author{
-Eric Archer \email{eric.archer@noaa.gov}
+Eric Archer \email{eric.ivan.archer@gmail.com}
 }

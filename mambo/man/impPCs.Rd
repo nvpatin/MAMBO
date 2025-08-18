@@ -22,5 +22,5 @@ list containing \code{rotation}, \code{x}, and \code{importance}
 Return PCA filtered for just the important principal components
 }
 \author{
-Eric Archer \email{eric.archer@noaa.gov}
+Eric Archer \email{eric.ivan.archer@gmail.com}
 }

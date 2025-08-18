@@ -11,7 +11,7 @@
 #' @param min.pct.reps minimum percent of replicates that an ASV should be 
 #'   identified as an outlier in to be saved.
 #'
-#' @author Eric Archer \email{eric.archer@@noaa.gov}
+#' @author Eric Archer \email{eric.ivan.archer@@gmail.com}
 #'
 #' @export
 #'
@@ -20,17 +20,17 @@ outlierLoadings <- function(
 ) {
   extractPCA(results)$loadings[[locus]] |> 
     dplyr::rename(pcs = 'pc') |> 
-    dplyr::filter(pcs == pc) |> 
-    dplyr::group_by(rep) |> 
-    dplyr::mutate(is.outlier = isOutlier(loading, type, thresh)) |> 
+    dplyr::filter(.data$pcs == pc) |> 
+    dplyr::group_by(.data$rep) |> 
+    dplyr::mutate(is.outlier = isOutlier(.data$loading, type, thresh)) |> 
     dplyr::ungroup() |> 
-    dplyr::group_by(asv) |> 
+    dplyr::group_by(.data$asv) |> 
     dplyr::summarize(
-      mean.loading = mean(loading),
-      median.loading = stats::median(loading),
-      pct.reps = mean(is.outlier),
+      mean.loading = mean(.data$loading),
+      median.loading = stats::median(.data$loading),
+      pct.reps = mean(.data$is.outlier),
       .groups = 'drop'
     ) |> 
-    dplyr::arrange(dplyr::desc(median.loading)) |> 
-    dplyr::filter(pct.reps >= min.pct.reps)
+    dplyr::arrange(dplyr::desc(.data$median.loading)) |> 
+    dplyr::filter(.data$pct.reps >= min.pct.reps)
 }

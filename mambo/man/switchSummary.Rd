@@ -4,12 +4,23 @@
 \alias{switchSummary}
 \title{Summary of bayesian switches}
 \usage{
-switchSummary(results, min.p = 0.9, plot = TRUE)
+switchSummary(
+  results,
+  min.p = 0.9,
+  resp.pcs = NULL,
+  pred.pcs = NULL,
+  plot = TRUE
+)
 }
 \arguments{
 \item{results}{output of a \link[mambo]{mambo} run.}
 
 \item{min.p}{minimum proportion of inclusion to highlight a predictor.}
+
+\item{resp.pcs, pred.pcs}{numeric vectors giving the response and predictor
+PCs to summarize. If \code{NULL}, then the minimum number of PCs extracted 
+for the response and predictor variables across all replicates are
+summarized.}
 
 \item{plot}{display summary plot?}
 }
@@ -20,5 +31,5 @@ a list with a summary table and plot object.
 Summarize posterior of predictor switches
 }
 \author{
-Eric Archer \email{eric.archer@noaa.gov}
+Eric Archer \email{eric.ivan.archer@gmail.com}
 }

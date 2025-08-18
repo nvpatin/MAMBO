@@ -33,5 +33,5 @@ identified as an outlier in to be saved.}
 Return loading summary of outlier ASVs.
 }
 \author{
-Eric Archer \email{eric.archer@noaa.gov}
+Eric Archer \email{eric.ivan.archer@gmail.com}
 }

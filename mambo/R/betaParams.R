@@ -9,7 +9,7 @@
 #'   the second dimension are the ASVs, and the third dimension are the two beta 
 #'   shape parameters.
 #'
-#' @author Eric Archer \email{eric.archer@@noaa.gov}
+#' @author Eric Archer \email{eric.ivan.archer@@gmail.com}
 #'
 betaParams <- function(x) {
   # read data if filename is given

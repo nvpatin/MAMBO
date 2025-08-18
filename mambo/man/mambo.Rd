@@ -86,5 +86,5 @@ data frames, or names of comma-delimited (.csv) files where values are the
 occurence (number of reads) for each ASV (rows) in each sample (columns).
 }
 \author{
-Eric Archer \email{eric.archer@noaa.gov}
+Eric Archer \email{eric.ivan.archer@gmail.com}
 }

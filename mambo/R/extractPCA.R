@@ -6,7 +6,7 @@
 #' @return a list with a data frame of component loadings (\code{$loadings}) and scores
 #'   (\code{$scores}) for each locus.
 #'
-#' @author Eric Archer \email{eric.archer@@noaa.gov}
+#' @author Eric Archer \email{eric.ivan.archer@@gmail.com}
 #'
 #' @export
 #'
@@ -31,29 +31,31 @@ extractPCA <- function(results) {
       abind::abind(along = 3) |> 
       aperm(c(1, 3, 2))
     dimnames(res)[[3]] <- 1:dim(res)[3]
-    as.data.frame.table(res) |> 
+    res |> 
+      as.data.frame.table() |> 
       stats::setNames(c('asv', 'pc', 'rep', 'loading')) |> 
       dplyr::mutate(
-        asv = as.character(asv),
-        pc = as.numeric(gsub('PC', '', pc)),
-        rep = as.numeric(rep)
+        asv = as.character(.data$asv),
+        pc = as.numeric(gsub('PC', '', .data$pc)),
+        rep = as.numeric(.data$rep)
       )
   })
   
   scores <- lapply(pca.list, function(rep) {
     min.pcs <- min(sapply(rep$x, function(x) dim(x)[2]))
-    sc <- lapply(rep$x, function(x) x[1:min.pcs, 1:min.pcs])
+    sc <- lapply(rep$x, function(x) x[, 1:min.pcs])
     res <- abind::abind(sc, along = 3) |> 
       apply(2, .switchSigns, simplify = FALSE) |> 
       abind::abind(along = 3) |> 
       aperm(c(1, 3, 2))
     dimnames(res)[[3]] <- 1:dim(res)[3]
-    as.data.frame.table(res) |> 
+    res |> 
+      as.data.frame.table() |> 
       stats::setNames(c('sample', 'pc', 'rep', 'score')) |> 
       dplyr::mutate(
-        sample = as.character(sample),
-        pc = as.numeric(gsub('PC', '', pc)),
-        rep = as.numeric(rep)
+        sample = as.character(.data$sample),
+        pc = as.numeric(gsub('PC', '', .data$pc)),
+        rep = as.numeric(.data$rep)
       )
   })
   

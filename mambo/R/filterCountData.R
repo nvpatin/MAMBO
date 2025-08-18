@@ -11,7 +11,7 @@
 #'
 #' @return matrix of count data with filters applied.
 #'
-#' @author Eric Archer \email{eric.archer@@noaa.gov}
+#' @author Eric Archer \email{eric.ivan.archer@@gmail.com}
 #' 
 #' @export
 #' 

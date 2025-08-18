@@ -12,7 +12,7 @@
 #'
 #' @return a \code{runjags} object created by \code{\link[runjags]{run.jags}}.
 #'s
-#' @author Eric Archer \email{eric.archer@@noaa.gov}
+#' @author Eric Archer \email{eric.ivan.archer@@gmail.com}
 #'
 jagsPClm <- function(pc.resp, pc.preds, chains, adapt, burnin, total.samples, thin) {
   data.list <- list(
