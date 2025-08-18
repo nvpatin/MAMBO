@@ -31,12 +31,29 @@ result <- mambo(
   resp.counts = counts.18s, 
   pred.label = '16s', 
   pred.counts = counts.16s, 
-  nrep = 5, 
-  chains = 10
+  nrep = 10, 
+  chains = 3,
+  adapt=100,
+  burnin=1000
 )
 ```
 
-## Examine Results
+To skip the Bayesian modeling and just run the PCAs, set bayesian=FALSE
+```{r mambo, include=FALSE}
+result <- mambo(
+  resp.label = '18s', 
+  resp.counts = counts.18s, 
+  pred.label = '16s', 
+  pred.counts = counts.16s, 
+  nrep = 10, 
+  chains = 3,
+  adapt = 100,
+  burnin = 1000,
+  bayesian = FALSE
+)
+```
+
+## Examine model parameters and outputs
 
 The return value of the **mambo()** function is list, containing five elements:   
 
@@ -62,28 +79,79 @@ result$run.time
 
 5) A list of the results for every replicate.  Each element in this list contains the PCA results for both loci ($pca)
 ```{r}
-str(result$reps[[1]]$pca[[1]])
+result$reps[[1]]$pca[[1]]
+```
+
+6) A list of the results for every replicate for just one locus
+```{r}
+result$reps[[1]]$pca$`16s`
+result$reps[[1]]$pca$`18s`
 ```
 
 ...and a matrix with summaries of the posteriors of the Bayesian linear model:
 ```{r}
-str(result$reps[[1]]$post.smry)
+result$reps[[1]]$post.smry
 ```
 
 ...and a list of the actual posterior sample from the Bayesian linear model:
 ```{r}
-str(result$reps[[1]]$post.list)
+result$reps[[1]]$post.list
+```
+
+## Plot results
+
+# Import metadata files, which must include a "sample" column with sample IDs
+
+```{r meta}
+meta.16s <- read.csv(file = "Merged2018_16S_meta_filtered.csv")
+meta.18s <- read.csv(file = "Merged2018_18S_meta_filtered.csv")
+```
+
+# Plot alpha diversity (the effective number of ASVs, Hill number = 1)
+
+```{r diversity}
+#16S
+plotDiversity(result, '16s', type = "ellipse", pc.x = 1, 
+              pc.y = 2, sample.df = meta.16s,
+              ellipse.fill = 'Depth_group_m', facet.by = 'Cruise)
+```
+
+```{r diversity}
+#18S
+plotDiversity(result, '18s', type = "ellipse", pc.x = 1, 
+              pc.y = 2, sample.df = meta.18s,
+              ellipse.fill = 'Depth_group_m', facet.by = 'Cruise)
 ```
 
 ## Plot the PCAs for each marker gene ("locus")
-```{r PCA_16S}
-plotPCs(result, '16s')
+
+```{r PCA}
+# default type = "ellipse", can change with type = "density"
+#16S
+plotPCs(result, '16s', pc.x = 1, pc.y = 2, 
+        sample.df = meta.16s, ellipse.fill = 'Depth_group_m', 
+        facet.by = 'Cruise')
 ```
 
-```{r PCA_18S}
-plotPCs(result, '18s')
+```{r PCA}
+#18S
+plotPCs(result, '18s', pc.x = 1, pc.y = 2, 
+        sample.df = meta.18s, ellipse.fill = 'Depth_group_m', 
+        facet.by = 'Cruise')
 ```
 
+# Extract the PC scores
+```{r scores}
+scores.16s <- extractPCA(result)$scores[['16s']]
+scores.18s <- extractPCA(result)$scores[['18s']]
+```
+
+# Summarize the posterior of predictive switches for a given number of 
+# response and predictor PCs (here the first four of each)
+```{r switch}
+switchSummary(result, min.p = 0.9, resp.pcs = 1:4, pred.pcs = 1:4)
+```
+ 
 ## Check which ASVs are outliers, ie driving the separations
 ```{r outliers_16S}
 outliers.16s.pc1 <- outlierLoadings(result, locus = '16s', pc = 1)
@@ -97,6 +165,12 @@ head(outliers.18s.pc1)
 ```
 
 ### Identify taxonomy of outlier ASVs
+
+```{r taxa}
+taxa.16s <- read.csv(file = "Merged2018_16S_taxa_filtered.csv")
+taxa.18s <- read.csv(file = "Merged2018_18S_taxa_filtered.csv")
+```
+
 ```{r taxa}
 # Add column name to match ASV tibble column name if it doesn't already
 taxa.16s$asv <- rownames(taxa.16s)
