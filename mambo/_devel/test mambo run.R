@@ -1,24 +1,19 @@
 rm(list = ls())
 library(mambo)
-library(tidyverse)
 
-fl16s <- read_tsv('../../Data/ASV tables/Flyer2018_16S_table_counts.tsv') |> 
-  column_to_rownames('ASV ID') |> 
-  filterCountData()
+lasker.samples <- sample.meta$sample[sample.meta$cruise == 'Lasker']
 
-fl18s <- read_tsv('../../Data/ASV tables/Flyer2018_18S_table_counts.tsv') |> 
-  column_to_rownames('ASV ID')|> 
-  filterCountData()
+lasker.16s <- filterCountData(counts.16s[, lasker.samples])
+lasker.18s <- filterCountData(counts.18s[, lasker.samples])
 
-result <- mambo(
-  resp.label = '18s', 
-  resp.counts = fl18s, 
-  pred.label = '16s', 
-  pred.counts = fl16s, 
-  nrep = 100, 
-  chains = 10
+mambo(
+  resp.label = 'Lasker_18S', 
+  resp.counts = lasker.18s, 
+  pred.label = 'Lasker_16S', 
+  pred.counts = lasker.16s, 
+  nrep = 10, 
+  chains = 3,
+  adapt = 100,
+  burnin = 1000,
+  run.label = 'Lasker'
 )
-
-plotPCs(result, '16s')
-
-plotPCs(result, '18s')

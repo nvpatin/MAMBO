@@ -93,3 +93,13 @@ NULL
 #' @references << add a reference >>
 #' @keywords datasets
 NULL
+
+#' @docType data
+#' @name sample.meta
+#' @title Metadata for CCE samples
+#' @description << add a description >>
+#' @usage data(sample.meta)
+#' @format data.frame
+#' @references << add a reference >>
+#' @keywords datasets
+NULL
