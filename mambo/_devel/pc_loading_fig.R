@@ -15,7 +15,7 @@ df <- counts.16s |>
   group_by(sample, source) |> 
   mutate(pct = count / sum(count)) |> 
   summarize(
-    read.count = sum(count),
+    l.read.count = log10(sum(count)),
     diversity = sprex::diversity(pct),
     .groups = 'drop'
   )
@@ -28,18 +28,24 @@ plotLoadingBySource <- function(results, count.data, locus, pc, df) {
   t(count.data)[, ol$asv] |> 
     as.data.frame() |> 
     rownames_to_column('sample') |> 
-    pivot_longer(-sample, names_to = 'asv', values_to = 'counts') |>
+    pivot_longer(-sample, names_to = 'asv', values_to = 'count') |>
     left_join(ol, by = 'asv') |> 
     left_join(df, by = 'sample') |> 
     mutate(
       sample = reorder(sample, diversity),
       asv = reorder(asv, abs(median.loading)),
-      counts = ifelse(counts == 0, NA, counts),
+      log.counts = ifelse(count == 0, NA, log10(count)),
       sign = ifelse(median.loading > 0, 'positive', 'negative'),
       sign = factor(sign, levels = c('positive', 'negative'))
     ) |> 
+    group_by(sample) |> 
+    mutate(
+      pct = count / sum(count),
+      logit.rel.abund = ifelse(is.na(count), NA, log10(pct / (1 - pct)))
+    ) |> 
+    ungroup() |> 
     ggplot(aes(sample, asv)) +
-    geom_tile(aes(fill = counts)) +
+    geom_tile(aes(fill = logit.rel.abund)) +
     scale_fill_viridis_c() +
     labs(x = 'Sample', y = 'ASV', title = paste0(locus, ': PC', pc)) +
     facet_grid(sign ~ source, scales = 'free') +
