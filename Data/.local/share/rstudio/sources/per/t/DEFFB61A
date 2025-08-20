@@ -1,0 +1,28 @@
+{
+    "id": "DEFFB61A",
+    "path": null,
+    "project_path": null,
+    "type": "object_explorer",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1755715528476.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "id": "2678c93eec3145abac323ea6f488102d",
+        "name": "by.cruise",
+        "title": "by.cruise",
+        "language": "R",
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 141733920800,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1755715528476,
+    "read_only": false,
+    "read_only_alternatives": []
+}
