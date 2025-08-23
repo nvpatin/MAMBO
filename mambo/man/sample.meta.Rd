@@ -11,9 +11,6 @@ data.frame
 data(sample.meta)
 }
 \description{
-<< add a description >>
-}
-\references{
-<< add a reference >>
+CN18S, CN18F, and Lasker 2018 environmental metadata
 }
 \keyword{datasets}

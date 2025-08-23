@@ -11,9 +11,6 @@ data.frame
 data(counts.16s)
 }
 \description{
-<< add a description >>
-}
-\references{
-<< add a reference >>
+CN18S, CN18F, and Lasker 2018 16S ASV table
 }
 \keyword{datasets}

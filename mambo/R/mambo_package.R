@@ -30,7 +30,6 @@ NULL
 #' @description CN18S, CN18F, and Lasker 2018 16S ASV table
 #' @usage data(counts.16s)
 #' @format data.frame
-#' @references NA
 #' @keywords datasets
 NULL
 
@@ -40,7 +39,6 @@ NULL
 #' @description CN18S, CN18F, and Lasker 2018 18S ASV table
 #' @usage data(counts.18s)
 #' @format data.frame
-#' @references NA
 #' @keywords datasets
 NULL
 
@@ -70,7 +68,6 @@ NULL
 #' @description CN18S, CN18F, and Lasker 2018 16S taxonomy
 #' @usage data(taxa.16s)
 #' @format data.frame
-#' @references NA
 #' @keywords datasets
 NULL
 
@@ -80,7 +77,6 @@ NULL
 #' @description CN18S, CN18F, and Lasker 2018 18S taxonomy
 #' @usage data(taxa.18s)
 #' @format data.frame
-#' @references NA
 #' @keywords datasets
 NULL
 
@@ -100,6 +96,5 @@ NULL
 #' @description CN18S, CN18F, and Lasker 2018 environmental metadata
 #' @usage data(sample.meta)
 #' @format data.frame
-#' @references NA
 #' @keywords datasets
 NULL

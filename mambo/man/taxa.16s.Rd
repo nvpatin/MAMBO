@@ -11,9 +11,6 @@ data.frame
 data(taxa.16s)
 }
 \description{
-<< add a description >>
-}
-\references{
-<< add a reference >>
+CN18S, CN18F, and Lasker 2018 16S taxonomy
 }
 \keyword{datasets}
