@@ -3,27 +3,27 @@ library(mambo)
 
 df <- data.frame(sample = colnames(counts.16s)) |> 
   mutate(
-    source = case_when(
+    cruise = case_when(
       stringr::str_starts(sample, 'Lasker') ~ 'Lasker',
       stringr::str_starts(sample, 'CN18S') ~ 'CN18S',
       stringr::str_starts(sample, 'CN18F') ~ 'CN18F'
     )
   ) 
 
-by.source <- lapply(split(df, df$source), function(source.df) {
+by.cruise <- lapply(split(df, df$cruise), function(cruise.df) {
   mambo(
     resp.label = '18s', 
-    resp.counts = counts.18s[, source.df$sample], 
+    resp.counts = counts.18s[, cruise.df$sample], 
     pred.label = '16s', 
-    pred.counts = counts.16s[, source.df$sample], 
-    nrep = 50, 
+    pred.counts = counts.16s[, cruise.df$sample], 
+    nrep = 100, 
     bayesian = FALSE,
-    run.label = unique(source.df$source)
+    run.label = unique(cruise.df$cruise)
   )
 })
 
 pdf('by_cruise_pca.pdf', height = 11, width = 11)
-imap(by.source, function(x, idx) {
+imap(by.cruise, function(x, idx) {
   div.df <- x$reps |> 
     lapply(function(x) x$sample.diversity) |> 
     dplyr::bind_rows() |> 

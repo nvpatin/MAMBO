@@ -4,7 +4,13 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(
+  echo = TRUE,
+  comment = "",
+  prompt = FALSE,
+  fig.width = 10,
+  fig.height = 10
+)
 ```
 
 This is a tutorial for running metabarcoding data sets through MAMBO (Metabarcoding Analysis of Modeled Bayesian Occurrences). You should start with two ASV tables, each of which has columns as samples and rows as ASVs.
@@ -15,50 +21,74 @@ library(mambo)
 
 ## ASV Tables
 
-ASV count tables should be loaded as R data frames or matrices. The values in the tables represent the occurrence (number of reads) fore each ASV (rows) in each sample (columns). The table should have both row and column names uniquely identifying ASVs and samples.
+ASV count tables should be loaded as R data frames or matrices. The values in the tables represent the occurrence (number of reads) for each ASV (rows) in each sample (columns). The table should have both row and column names uniquely identifying ASVs and samples.
 
-We supply two example ASV count tables in **mambo**: '**counts.16s**' and '**counts.18s**'.
+We supply two sets of two example ASV count tables in `mambo`: 16S and 18S data from the California Current Ecosystem ('`counts.16s`' and '`counts.18s`'), and 12S and COI data from Blackman ('`counts.12s`' and '`counts.COI`').
 ```{r data}
 counts.16s[1:8, 1:4]
 ```
 
-## Run MAMBO 
+We also supply metadata for the CCE samples as `sample.meta`:
 
-To run the main function, **mambo()**, we need to supply labels for the response and predictor datasets and the response and predictor count tables, along with the number of replicates (**nrep**) and other MCMC parameters (see **?mambo**).  
-```{r mambo, include=FALSE}
-result <- mambo(
-  resp.label = '18s', 
-  resp.counts = counts.18s, 
-  pred.label = '16s', 
-  pred.counts = counts.16s, 
-  nrep = 10, 
-  chains = 3,
-  adapt=100,
-  burnin=1000
-)
+```{r}
+str(sample.meta)
 ```
 
-To skip the Bayesian modeling and just run the PCAs, set bayesian=FALSE
-```{r mambo, include=FALSE}
-result <- mambo(
-  resp.label = '18s', 
-  resp.counts = counts.18s, 
-  pred.label = '16s', 
-  pred.counts = counts.16s, 
+
+## Filter data
+
+First we'll extract the Lasker samples from the CCE 16S and 18S data and filter them using the default values:
+
+```{r}
+lasker.samples <- sample.meta$sample[sample.meta$cruise == 'Lasker']
+
+lasker.16s <- filterCountData(counts.16s[, lasker.samples])
+lasker.18s <- filterCountData(counts.18s[, lasker.samples])
+```
+
+
+## Run MAMBO 
+
+To run the main function, `mambo()`, we need to supply labels for the response and predictor datasets and the response and predictor count tables, along with the number of replicates (`nrep`) and parameters for the Bayesian MCMC run (see `?mambo`). One can also specify a label for the run ('`run.label`') that will be used for the log and results file. By default, this is set to '`mambo`'. 
+```{r, echo = TRUE, eval = FALSE}
+mambo(
+  resp.label = 'Lasker_18S', 
+  resp.counts = lasker.18s, 
+  pred.label = 'Lasker_16S', 
+  pred.counts = lasker.16s, 
   nrep = 10, 
   chains = 3,
   adapt = 100,
   burnin = 1000,
-  bayesian = FALSE
+  run.label = 'Lasker'
 )
+```
+
+To skip the Bayesian modeling and just compute diversity and run the PCAs, set `bayesian = FALSE`:
+```{r, echo = TRUE, eval = FALSE}
+mambo(
+  resp.label = 'Lasker_18S', 
+  resp.counts = lasker.18s, 
+  pred.label = 'Lasker_16S', 
+  pred.counts = lasker.16s, 
+  nrep = 10, 
+  bayesian = FALSE,
+  label = 'Lasker'
+)
+```
+
+While `mambo()` is running, it will output progress on the screen and to a log file named, '<label>.YYYYMMDD_HHmmSS.log'. When the run is complete, it will write its results to an .RDS file in the working directory that is named the same as the log file, but ends in '.rds'. This file can be read into an R object using `readRDS()`:
+
+```{r}
+result <- readRDS('Lasker.20250819_124325.rds')
 ```
 
 ## Examine model parameters and outputs
 
-The return value of the **mambo()** function is list, containing five elements:   
+The output of `mambo()` is a list with five elements:
 
-1) The filename of the .RDS file that was written that contains this **mambo()** output list:  
-```{r rds}
+1) The filename of the .RDS file that was written:  
+```{r}
 result$filename
 ```
 
@@ -77,109 +107,115 @@ result$params
 result$run.time
 ```
 
-5) A list of the results for every replicate.  Each element in this list contains the PCA results for both loci ($pca)
+5) A list of the results for every replicate (`$reps`). 
 ```{r}
-result$reps[[1]]$pca[[1]]
+length(result$reps)
 ```
 
-6) A list of the results for every replicate for just one locus
+Each element in the `$reps` list contains results for diversity and PCAs for each locus, and the Bayesian modelling for every replicate: 
 ```{r}
-result$reps[[1]]$pca$`16s`
-result$reps[[1]]$pca$`18s`
+names(result$reps[[1]])
 ```
 
-...and a matrix with summaries of the posteriors of the Bayesian linear model:
+The `$total.diversity` element is a vector giving the total ASV diversity for each locus:
 ```{r}
-result$reps[[1]]$post.smry
+result$reps[[1]]$total.diversity
 ```
 
-...and a list of the actual posterior sample from the Bayesian linear model:
+The `$sample.diversity` element is a data.frame giving the ASV diversity for each sample (rows) at each locus (columns):
 ```{r}
-result$reps[[1]]$post.list
+head(result$reps[[1]]$sample.diversity)
 ```
+
+The `$pca` element contains PCA results for each locus, where `$rotation` has the loading values of ASVs on the PCs, `$x` has the scores for each sample on each PC, and `$importance` gives summary information on variance explained by each PC:
+```{r}
+str(result$reps[[1]]$pca[['Lasker_16S']])
+```
+
+If a Bayesian analysis was conducted, then the `$post.smry` element will be a matrix providing a summary of the posteriors from the Bayesian model for each parameter:
+```{r}
+head(result$reps[[1]]$post.smry)
+```
+
+... and `$post.list` will contain the actual posteior sample:
+```{r}
+str(result$reps[[1]]$post.list)
+```
+
+If no Bayesian model was conducted, both of these will be `NULL`.
+
+
 
 ## Plot results
 
-# Import metadata files, which must include a "sample" column with sample IDs
+### Plot ASV diversity (the effective number of ASVs)
 
-```{r meta}
-meta.16s <- read.csv(file = "Merged2018_16S_meta_filtered.csv")
-meta.18s <- read.csv(file = "Merged2018_18S_meta_filtered.csv")
+```{r}
+plotDiversity(
+  result = result, 
+  type = "ellipse", 
+  sample.df = sample.meta,
+  ellipse.fill = 'depth_m'
+)
 ```
 
-# Plot alpha diversity (the effective number of ASVs, Hill number = 1)
+### Plot selected PCA components for each marker gene ("locus")
+#### 16S
 
-```{r diversity}
-#16S
-plotDiversity(result, '16s', type = "ellipse", pc.x = 1, 
-              pc.y = 2, sample.df = meta.16s,
-              ellipse.fill = 'Depth_group_m', facet.by = 'Cruise)
+```{r}
+plotPCs(
+  result = result, 
+  locus = 'Lasker_16S', 
+  pc.x = 1, 
+  pc.y = 2, 
+  sample.df = sample.meta, 
+  ellipse.fill = 'depth_m'
+)
 ```
 
-```{r diversity}
-#18S
-plotDiversity(result, '18s', type = "ellipse", pc.x = 1, 
-              pc.y = 2, sample.df = meta.18s,
-              ellipse.fill = 'Depth_group_m', facet.by = 'Cruise)
+#### 18S
+
+```{r}
+plotPCs(
+  result = result, 
+  locus = 'Lasker_18S', 
+  pc.x = 1, 
+  pc.y = 2, 
+  sample.df = sample.meta, 
+  ellipse.fill = 'depth_m'
+)
 ```
 
-## Plot the PCAs for each marker gene ("locus")
-
-```{r PCA}
-# default type = "ellipse", can change with type = "density"
-#16S
-plotPCs(result, '16s', pc.x = 1, pc.y = 2, 
-        sample.df = meta.16s, ellipse.fill = 'Depth_group_m', 
-        facet.by = 'Cruise')
-```
-
-```{r PCA}
-#18S
-plotPCs(result, '18s', pc.x = 1, pc.y = 2, 
-        sample.df = meta.18s, ellipse.fill = 'Depth_group_m', 
-        facet.by = 'Cruise')
-```
-
-# Extract the PC scores
+## Extract the PC scores
 ```{r scores}
-scores.16s <- extractPCA(result)$scores[['16s']]
-scores.18s <- extractPCA(result)$scores[['18s']]
+scores.16s <- extractPCA(result)$scores[['Lasker_16S']]
+
+head(scores.16s)
 ```
 
-# Summarize the posterior of predictive switches for a given number of 
-# response and predictor PCs (here the first four of each)
-```{r switch}
-switchSummary(result, min.p = 0.9, resp.pcs = 1:4, pred.pcs = 1:4)
+## Summarize the posterior of predictive switches for a given number of response and predictor PCs (here the first four of each)
+```{r switch, message=FALSE, warning=FALSE}
+sw.smry <- switchSummary(result, min.p = 0.9, resp.pcs = 1:4, pred.pcs = 1:4)
+
+head(sw.smry)
 ```
  
-## Check which ASVs are outliers, ie driving the separations
-```{r outliers_16S}
-outliers.16s.pc1 <- outlierLoadings(result, locus = '16s', pc = 1)
-outliers.18s.pc1 <- outlierLoadings(result, locus = '18s', pc = 1)
+## Identify ASVs that have unusually high or low loadings on a component for a lcous. These contrasts define the source of variation for that PC.
+```{r outliers_16S, paged.print=FALSE}
+outliers.16s.pc1 <- outlierLoadings(result, locus = 'Lasker_16S', pc = 1)
 
-head(outliers.16s.pc1)
+outliers.16s.pc1
 ```
 
-```{r outliers_18S}
-head(outliers.18s.pc1)
-```
 
-### Identify taxonomy of outlier ASVs
-
-```{r taxa}
-taxa.16s <- read.csv(file = "Merged2018_16S_taxa_filtered.csv")
-taxa.18s <- read.csv(file = "Merged2018_18S_taxa_filtered.csv")
-```
+## Identify taxonomy of outlier ASVs
 
 ```{r taxa}
 # Add column name to match ASV tibble column name if it doesn't already
 taxa.16s$asv <- rownames(taxa.16s)
-taxa.18s$asv <- rownames(taxa.18s)
 
 # Merge the tibbles
 asvs_out_16s_tax <- dplyr::left_join(outliers.16s.pc1, taxa.16s, by = "asv")
-asvs_out_18s_tax <- dplyr::left_join(outliers.18s.pc1, taxa.18s, by = "asv")
 
 head(asvs_out_16s_tax)
 ```
-

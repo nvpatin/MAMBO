@@ -11,9 +11,9 @@ data.frame
 data(counts.COI)
 }
 \description{
-<< add a description >>
+Blackman et al. 2022 COI ASV table
 }
 \references{
-<< add a reference >>
+https://doi.org/10.1038/s42003-022-03216-z
 }
 \keyword{datasets}

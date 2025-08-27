@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 []
+=======
+[{"handle":"0468F9D8","caption":"Terminal 1","show_on_output":false,"interaction_mode":2,"max_output_lines":1000,"buffered_output":"","exit_code":129,"terminal_sequence":1,"allow_restart":true,"title":"~","child_procs":false,"shell_type":"bash","channel_mode":1,"channel_id":"4365","alt_buffer":false,"cwd":"~","cols":154,"rows":46,"restarted":false,"autoclose":1,"zombie":false,"track_env":true}]
+>>>>>>> 5aad6402b7a7163af9ac9a027625935f02670768

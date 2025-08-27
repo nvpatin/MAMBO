@@ -76,8 +76,8 @@ plotDiversity <- function(results, type = c('ellipse', 'density'),
     if(!is.null(ellipse.fill)) {
       x <- gg + ggplot2::geom_polygon(
         ggplot2::aes(group = .data$sample, fill = .data[[ellipse.fill]]),
-        alpha = 0.75,
-        color = 'black'
+        alpha = 0.8,
+        color = 'white'
       ) 
       if(is.numeric(df[[ellipse.fill]])) {
         x <- x + ggplot2::scale_fill_viridis_c(option = 'viridis')
