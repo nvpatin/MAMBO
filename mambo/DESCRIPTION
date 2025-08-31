@@ -29,6 +29,7 @@ Imports:
   purrr,
   tidyr,
   ggplot2,
+  stringr,
   swfscMisc,
   parallel,
   rlang (>= 0.4.10),
