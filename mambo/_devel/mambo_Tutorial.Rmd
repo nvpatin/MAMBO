@@ -8,8 +8,8 @@ knitr::opts_chunk$set(
   echo = TRUE,
   comment = "",
   prompt = FALSE,
-  fig.width = 10,
-  fig.height = 10
+  fig.width = 8,
+  fig.height = 8
 )
 ```
 
@@ -37,7 +37,7 @@ str(sample.meta)
 
 ## Filter data
 
-First we'll extract the Lasker samples from the CCE 16S and 18S data and filter them using the default values:
+First we'll extract the Lasker samples from the CCE 16S and 18S data and filter them using the default values. The `filterCountData()` function will report the number of ASVs and samples removed at each step.
 
 ```{r}
 lasker.samples <- sample.meta$sample[sample.meta$cruise == 'Lasker']
@@ -148,7 +148,7 @@ If no Bayesian model was conducted, both of these will be `NULL`.
 
 ## Plot results
 
-### Plot ASV diversity (the effective number of ASVs)
+### Plot ASV diversity (the effective number of ASVs).
 
 ```{r}
 plotDiversity(
@@ -158,8 +158,16 @@ plotDiversity(
   ellipse.fill = 'depth_m'
 )
 ```
+This demonstrates how 18S diversity (y-axis) changes relative to 16S diversity (x-axis). The red line shows a 1:1 correspondence and ellipses show the 95-th percentile of the replicates in each axis. We have color-coded each ellipse relative to the depth that the sample was taken from to highlight a general pattern of increasing diversity with depth.
 
-### Plot selected PCA components for each marker gene ("locus")
+### Plot distribution of percent variance accounted for by each Principal Component for a locus.
+
+```{r}
+screePlot(result, locus = 'Lasker_16S')
+```
+
+
+### Plot selected Principal Components for each marker gene ("locus")
 #### 16S
 
 ```{r}

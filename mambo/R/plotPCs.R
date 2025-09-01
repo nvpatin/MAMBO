@@ -104,10 +104,7 @@ plotPCs <- function(results, locus, pc.x = 1, pc.y = 2,
       } else {
         x <- x + ggplot2::scale_fill_brewer(palette = 'Set2')
       }
-      x + ggplot2::theme(
-        legend.position = 'top',
-        legend.key.width = ggplot2::unit(0.4, 'npc')
-      )
+      x + ggplot2::theme(legend.position = 'top')
     } else {
       gg + ggplot2::geom_polygon(
         ggplot2::aes(group = .data$sample), 
