@@ -32,10 +32,10 @@ screePlot <- function(results, locus, plot = TRUE) {
     dplyr::summarize(pct.var = stats::median(.data$pct), .groups = 'drop') |> 
     dplyr::mutate(pc = as.numeric(stringr::str_remove(.data$pc, 'PC'))) |> 
     dplyr::arrange(.data$pc) |> 
-    dplyr::mutate(cum.pct = cumsum(pct.var)) |> 
-    tidyr::pivot_longer(-pc, names_to = 'type', values_to = 'pct') |> 
+    dplyr::mutate(cum.pct = cumsum(.data$pct.var)) |> 
+    tidyr::pivot_longer(-.data$pc, names_to = 'type', values_to = 'pct') |> 
     dplyr::mutate(
-      type = ifelse(type == 'pct.var', 'Absolute', 'Cumulative')
+      type = ifelse(.data$type == 'pct.var', 'Absolute', 'Cumulative')
     ) |> 
     ggplot2::ggplot(ggplot2::aes(x = .data$pc)) +
     ggplot2::geom_line(ggplot2::aes(y = .data$pct)) +
@@ -52,7 +52,7 @@ screePlot <- function(results, locus, plot = TRUE) {
       y = 'Percent of Variance',
       title = locus
     ) +
-    ggplot2::facet_wrap(~ type, nrow = 2, scales = 'free_y') +
+    ggplot2::facet_wrap(~ .data$type, nrow = 2, scales = 'free_y') +
     ggplot2::theme_minimal() +
     ggplot2::theme(
       axis.line.x = ggplot2::element_line(),
