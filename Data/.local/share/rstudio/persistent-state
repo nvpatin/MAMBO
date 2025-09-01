@@ -1,3 +1,7 @@
 activeClientUrl="http://localhost:8787/"
 displayName="rstudio"
+<<<<<<< HEAD
+portToken="3d050409916e"
+=======
 portToken="ba88a3e10c15"
+>>>>>>> 5aad6402b7a7163af9ac9a027625935f02670768

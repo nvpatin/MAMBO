@@ -5,5 +5,9 @@
             "ascending": true
         }
     ],
+<<<<<<< HEAD
+    "path": "~"
+=======
     "path": "~/Metadata"
+>>>>>>> 5aad6402b7a7163af9ac9a027625935f02670768
 }
