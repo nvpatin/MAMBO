@@ -6,9 +6,7 @@
 \usage{
 plotDiversity(
   results,
-  type = c("ellipse", "density"),
   ellipse.p = 0.95,
-  num.bins = 50,
   sample.df = NULL,
   ellipse.fill = NULL,
   facet.by = NULL,
@@ -19,11 +17,7 @@ plotDiversity(
 \arguments{
 \item{results}{output of a \code{mambo} run.}
 
-\item{type}{plot as ellipse of samples or 2-D density.}
-
 \item{ellipse.p}{probability density level of ellipse.}
-
-\item{num.bins}{number of bins for each axis if 2-D density is plotted.}
 
 \item{sample.df}{a data frame containing columns to color ellipses by 
 (\code{ellipse.fill}) or facet by (\code{facet.by}). Must have a column 
@@ -41,7 +35,7 @@ the plot by.}
 }
 \description{
 Plot diversity (effective number of ASVs) for predictor and
-response loci
+response loci.
 }
 \author{
 Eric Archer \email{eric.ivan.archer@gmail.com}

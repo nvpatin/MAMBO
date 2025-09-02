@@ -6,12 +6,11 @@
 \usage{
 plotPCs(
   results,
-  locus,
+  locus.x,
+  locus.y = locus.x,
   pc.x = 1,
   pc.y = 2,
-  type = c("ellipse", "density"),
   ellipse.p = 0.95,
-  num.bins = 50,
   sample.df = NULL,
   ellipse.fill = NULL,
   facet.by = NULL,
@@ -21,17 +20,17 @@ plotPCs(
 \arguments{
 \item{results}{output of a \code{mambo} run.}
 
-\item{locus}{label name of response or predictor locus.}
+\item{locus.x}{label name of response or predictor locus for x-axis.}
 
-\item{pc.x}{number of x-axis principal component.}
+\item{locus.y}{label name of response or predictor locus fo y-axis. If not 
+specified, then it defaults to \code{locus.x}. The plot will then be a 
+PCA biplot for a single locus.}
 
-\item{pc.y}{number of y-axis principal component.}
+\item{pc.x}{number of principal component for x-axis.}
 
-\item{type}{plot as ellipse of samples or 2-D density.}
+\item{pc.y}{number of principal component for y-axis.}
 
 \item{ellipse.p}{probability density level of ellipse.}
-
-\item{num.bins}{number of bins for each axis if 2-D density is plotted.}
 
 \item{sample.df}{a data frame containing columns to color ellipses by 
 (\code{ellipse.fill}) or facet by (\code{facet.by}). Must have a column 
@@ -50,7 +49,7 @@ the plot by.}
 \code{ggplot2} PCA biplot of scores.
 }
 \description{
-Plot principal component scores as ellipses or 2-D densities
+Create biplot of principal component scores as ellipses
 from multiple \code{MAMBO} replicates.
 }
 \author{

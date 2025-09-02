@@ -18,9 +18,9 @@
 outlierLoadings <- function(
   results, locus, pc, type = c('z', 'iqr'), thresh = 3, min.pct.reps = 0.95
 ) {
-  extractPCA(results)$loadings[[locus]] |> 
-    dplyr::rename(pcs = 'pc') |> 
-    dplyr::filter(.data$pcs == pc) |> 
+  extractPCA(results)$loadings |> 
+    dplyr::rename(p = 'pc', l = 'locus') |> 
+    dplyr::filter(.data$p == pc & .data$l == locus) |> 
     dplyr::group_by(.data$rep) |> 
     dplyr::mutate(is.outlier = isOutlier(.data$loading, type, thresh)) |> 
     dplyr::ungroup() |> 

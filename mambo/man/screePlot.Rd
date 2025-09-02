@@ -4,12 +4,10 @@
 \alias{screePlot}
 \title{Scree plot of principal components}
 \usage{
-screePlot(results, locus, plot = TRUE)
+screePlot(results, plot = TRUE)
 }
 \arguments{
 \item{results}{output of a \code{mambo} run.}
-
-\item{locus}{label name of response or predictor locus.}
 
 \item{plot}{display plot?}
 }

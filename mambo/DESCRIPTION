@@ -27,7 +27,6 @@ Imports:
   dplyr,
   car,
   purrr,
-  tidyr,
   ggplot2,
   stringr,
   swfscMisc,

@@ -1,11 +1,9 @@
 #' @title Plot diversity of predictors and response loci
 #' @description Plot diversity (effective number of ASVs) for predictor and
-#' response loci
+#' response loci.
 #'
 #' @param results output of a \code{mambo} run.
-#' @param type plot as ellipse of samples or 2-D density.
 #' @param ellipse.p probability density level of ellipse.
-#' @param num.bins number of bins for each axis if 2-D density is plotted.
 #' @param sample.df a data frame containing columns to color ellipses by 
 #' (\code{ellipse.fill}) or facet by (\code{facet.by}). Must have a column 
 #' called '\code{sample}' identifying samples in \code{locus}.
@@ -20,10 +18,10 @@
 #'
 #' @export
 #'
-plotDiversity <- function(results, type = c('ellipse', 'density'), 
-                          ellipse.p = 0.95, num.bins = 50, sample.df = NULL, 
-                          ellipse.fill = NULL, facet.by = NULL, log.axes = TRUE,
-                          plot = TRUE) {
+plotDiversity <- function(
+    results, ellipse.p = 0.95,  sample.df = NULL, ellipse.fill = NULL, 
+    facet.by = NULL, log.axes = TRUE,  plot = TRUE
+) {
   if(!is.null(ellipse.fill)) {
     if(!ellipse.fill %in% names(sample.df)) {
       stop("'", ellipse.fill, "' not in 'sample.df'")
@@ -35,34 +33,30 @@ plotDiversity <- function(results, type = c('ellipse', 'density'),
       stop("'", facet.by, "' not in 'sample.df'")
     }
   }
-
-  df <- results$reps |> 
-    lapply(function(x) x$sample.diversity) |> 
-    dplyr::bind_rows()
   
   pred <- results$labels['pred']
   resp <- results$labels['resp']
   
-  type <- match.arg(type)
-  if(type == 'ellipse') {
-    df <- df |> 
-      split(df$sample) |> 
-      purrr::imap(function(df, i) {
-        car::dataEllipse(
-          df[[pred]], 
-          df[[resp]], 
-          levels = ellipse.p, 
-          draw = FALSE
-        ) |> 
-          as.data.frame() |> 
-          dplyr::mutate(sample = i)
-      }) |> 
-      dplyr::bind_rows() |> 
-      stats::setNames(c(pred, resp, 'sample'))
-  }
+  df <- results$reps |> 
+    lapply(function(x) x$sample.diversity) |> 
+    dplyr::bind_rows() 
+  
+  df <- split(df, df$sample) |> 
+    purrr::imap(function(df, i) {
+      car::dataEllipse(
+        df[[pred]], 
+        df[[resp]], 
+        levels = ellipse.p, 
+        draw = FALSE
+      ) |> 
+        as.data.frame() |> 
+        dplyr::mutate(sample = i)
+    }) |> 
+    dplyr::bind_rows() |> 
+    stats::setNames(c(pred, resp, 'sample'))
   
   if(!is.null(sample.df)) df <- dplyr::left_join(df, sample.df, by = 'sample')
-    
+  
   gg <- df |> 
     ggplot2::ggplot(mapping = ggplot2::aes(x = .data[[pred]], y = .data[[resp]])) +
     ggplot2::geom_abline(intercept = 0, slope = 1, color = 'darkred') +
@@ -72,31 +66,24 @@ plotDiversity <- function(results, type = c('ellipse', 'density'),
     ) +
     ggplot2::theme_minimal()
   
-  gg <- if(type == 'ellipse') {
-    if(!is.null(ellipse.fill)) {
-      x <- gg + ggplot2::geom_polygon(
-        ggplot2::aes(group = .data$sample, fill = .data[[ellipse.fill]]),
-        alpha = 0.8,
-        color = 'white'
-      ) 
-      if(is.numeric(df[[ellipse.fill]])) {
-        x <- x + ggplot2::scale_fill_viridis_c(option = 'viridis')
-      } else {
-        x <- x + ggplot2::scale_fill_brewer(palette = 'Set2')
-      }
-      x + ggplot2::theme(legend.position = 'top')
+  gg <- if(!is.null(ellipse.fill)) {
+    x <- gg + ggplot2::geom_polygon(
+      ggplot2::aes(group = .data$sample, fill = .data[[ellipse.fill]]),
+      alpha = 0.8,
+      color = 'white'
+    ) 
+    if(is.numeric(df[[ellipse.fill]])) {
+      x <- x + ggplot2::scale_fill_viridis_c(option = 'viridis')
     } else {
-      gg + ggplot2::geom_polygon(
-        ggplot2::aes(group = .data$sample), 
-        fill = NA, 
-        color = 'black'
-      )
+      x <- x + ggplot2::scale_fill_brewer(palette = 'Set2')
     }
+    x + ggplot2::theme(legend.position = 'top')
   } else {
-    gg +
-      ggplot2::geom_bin_2d(bins = num.bins) +
-      ggplot2::scale_fill_viridis_c(option = 'viridis') +
-      ggplot2::theme(legend.position = 'none')
+    gg + ggplot2::geom_polygon(
+      ggplot2::aes(group = .data$sample), 
+      fill = NA, 
+      color = 'black'
+    )
   }
   
   if(log.axes) {
@@ -104,8 +91,10 @@ plotDiversity <- function(results, type = c('ellipse', 'density'),
       ggplot2::scale_x_log10() +
       ggplot2::scale_y_log10()
   }
-    
-  if(!is.null(facet.by)) gg <- gg + ggplot2::facet_wrap(~ .data[[facet.by]], ncol = 1)
+  
+  if(!is.null(facet.by)) {
+    gg <- gg + ggplot2::facet_wrap(~ .data[[facet.by]], ncol = 1)
+  }
   
   if(plot) print(gg)
   invisible(gg)

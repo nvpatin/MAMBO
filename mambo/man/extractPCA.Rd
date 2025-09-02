@@ -2,7 +2,7 @@
 % Please edit documentation in R/extractPCA.R
 \name{extractPCA}
 \alias{extractPCA}
-\title{Extract principal component loadings and scores}
+\title{Extract PCA values}
 \usage{
 extractPCA(results)
 }
@@ -10,11 +10,14 @@ extractPCA(results)
 \item{results}{output of a \code{mambo} run.}
 }
 \value{
-a list with a data frame of component loadings (\code{$loadings}) and scores
-  (\code{$scores}) for each locus.
+a list with data frames of component loadings (\code{$loadings}),
+scores (\code{$scores}), and component importance metrics (\code{$importance})
+for each replicate and locus. 
+NB: Only values for the minimum number of components across all replicates
+are returned.
 }
 \description{
-Extract principal component loadings and scores.
+Extract PCA loadings, scores, and importance metrics.
 }
 \author{
 Eric Archer \email{eric.ivan.archer@gmail.com}

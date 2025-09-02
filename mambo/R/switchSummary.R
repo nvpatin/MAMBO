@@ -30,18 +30,14 @@ switchSummary <- function(
   resp.pcs <- if(is.null(resp.pcs)) 1:min.pcs[resp] else {
     pcs <- 1:min.pcs[resp]
     pcs <- resp.pcs[resp.pcs %in% pcs]
-    if(length(pcs) == 0) {
-      stop('Requested response PCs not available.')
-    }
+    if(length(pcs) == 0) stop('Requested response PCs not available.')
     pcs
   }
     
   pred.pcs <- if(is.null(pred.pcs)) 1:min.pcs[pred] else {
     pcs <- 1:min.pcs[pred]
     pcs <- pred.pcs[pred.pcs %in% pcs]
-    if(length(pcs) == 0) {
-      stop('Requested predictor PCs not available.')
-    }
+    if(length(pcs) == 0) stop('Requested predictor PCs not available.')
     pcs
   }
   
@@ -80,7 +76,7 @@ switchSummary <- function(
       axis.text.x = ggplot2::element_text(angle = 45, hjust = 1)
     )
 
-  if(plot) print(p)
+  if(plot) suppressWarnings(print(p))
 
   list(smry = smry, plot = p)
 }

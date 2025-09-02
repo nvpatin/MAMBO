@@ -1,14 +1,15 @@
 #' @title Plot principal component scores with replicate uncertainty
-#' @description Plot principal component scores as ellipses or 2-D densities
+#' @description Create biplot of principal component scores as ellipses
 #' from multiple \code{MAMBO} replicates.
 #'
 #' @param results output of a \code{mambo} run.
-#' @param locus label name of response or predictor locus.
-#' @param pc.x number of x-axis principal component.
-#' @param pc.y number of y-axis principal component.
-#' @param type plot as ellipse of samples or 2-D density.
+#' @param locus.x label name of response or predictor locus for x-axis.
+#' @param locus.y label name of response or predictor locus fo y-axis. If not 
+#' specified, then it defaults to \code{locus.x}. The plot will then be a 
+#' PCA biplot for a single locus.
+#' @param pc.x number of principal component for x-axis.
+#' @param pc.y number of principal component for y-axis.
 #' @param ellipse.p probability density level of ellipse.
-#' @param num.bins number of bins for each axis if 2-D density is plotted.
 #' @param sample.df a data frame containing columns to color ellipses by 
 #' (\code{ellipse.fill}) or facet by (\code{facet.by}). Must have a column 
 #' called '\code{sample}' identifying samples in \code{locus}.
@@ -25,13 +26,17 @@
 #'
 #' @export
 #'
-plotPCs <- function(results, locus, pc.x = 1, pc.y = 2, 
-                    type = c('ellipse', 'density'), ellipse.p = 0.95, 
-                    num.bins = 50, sample.df = NULL, ellipse.fill = NULL,
-                    facet.by = NULL, plot = TRUE) {
-  if(missing(locus)) stop("'locus' must be specified.")
-  if(!locus %in% results$labels[c('resp', 'pred')]) {
-    stop("locus '", locus, "' is not in 'results'")
+plotPCs <- function(
+    results, locus.x, locus.y = locus.x, pc.x = 1, pc.y = 2, 
+    ellipse.p = 0.95, sample.df = NULL, ellipse.fill = NULL,
+    facet.by = NULL, plot = TRUE
+) {
+  if(missing(locus.x)) stop("'locus.x' must be specified.")
+  if(!locus.x %in% results$labels[c('resp', 'pred')]) {
+    stop("locus '", locus.x, "' is not in 'results'")
+  }
+  if(!locus.y %in% results$labels[c('resp', 'pred')]) {
+    stop("locus '", locus.y, "' is not in 'results'")
   }
   
   if(!is.null(ellipse.fill)) {
@@ -46,79 +51,67 @@ plotPCs <- function(results, locus, pc.x = 1, pc.y = 2,
     }
   }
   
-  scores <- extractPCA(results)$scores[[locus]]
+  pc.list <- extractPCA(results)
   
-  prop.var <- sapply(
-    results$reps, 
-    function(r) r$pca[[locus]]$importance['Proportion of Variance', c(pc.x, pc.y)]
-  ) |> 
-    t() |> 
-    apply(2, stats::median)
-
-  type <- match.arg(type)
-  df <- if(type == 'ellipse') {
-    scores |> 
-      split(scores$sample) |> 
-      purrr::imap(function(df, i) {
-        x <- dplyr::filter(df, .data$pc == pc.x)$score
-        y <- dplyr::filter(df, .data$pc == pc.y)$score
-        car::dataEllipse(x, y, levels = ellipse.p, draw = FALSE) |> 
-          as.data.frame() |> 
-          dplyr::mutate(sample = i)
-      }) |> 
-      dplyr::bind_rows()
-  } else {
-    scores |> 
-      dplyr::mutate(axis = ifelse(.data$pc == pc.x, 'x', 'y')) |> 
-      dplyr::filter(.data$pc %in% c(pc.x, pc.y)) |> 
-      dplyr::select(-dplyr::all_of('pc')) |> 
-      tidyr::pivot_wider(
-        id_cols = c('sample', 'rep'), 
-        names_from = 'axis', 
-        values_from = 'score'
-      )
-  }
+  prop.var <- pc.list$importance |> 
+    dplyr::filter(
+      ((.data$locus == locus.x & .data$pc == pc.x) |
+         (.data$locus == locus.y & .data$pc == pc.y)) &
+        .data$type == 'Proportion of Variance'
+    ) |> 
+    dplyr::group_by(.data$locus, .data$pc) |> 
+    dplyr::summarize(
+      prop = round(stats::median(.data$value) * 100, 1),
+      .groups = 'drop'
+    ) |> 
+    dplyr::mutate(
+      axis = ifelse(.data$locus == locus.x & .data$pc == pc.x, 'x', 'y'),
+      label = paste0(.data$locus, ' PC', .data$pc, ' (', .data$prop, '%)')
+    ) |> 
+    dplyr::arrange(.data$axis) |> 
+    dplyr::select(dplyr::all_of(c('axis', 'label'))) |> 
+    tibble::deframe()
+  
+  df <- pc.list$scores |> 
+    split(pc.list$scores$sample) |> 
+    purrr::imap(function(df, i) {
+      x <- dplyr::filter(df, .data$pc == pc.x & .data$locus == locus.x)$score
+      y <- dplyr::filter(df, .data$pc == pc.y & .data$locus == locus.y)$score
+      car::dataEllipse(x, y, levels = ellipse.p, draw = FALSE) |> 
+        as.data.frame() |> 
+        dplyr::mutate(sample = i)
+    }) |> 
+    dplyr::bind_rows() 
   
   if(!is.null(sample.df)) df <- dplyr::left_join(df, sample.df, by = 'sample')
-    
+  
   gg <- df |> 
     ggplot2::ggplot(mapping = ggplot2::aes(x = .data$x, y = .data$y)) +
     ggplot2::geom_hline(yintercept = 0, color = 'darkred') +
     ggplot2::geom_vline(xintercept = 0, color = 'darkred') +
-    ggplot2::labs(
-      x = paste0('PC', pc.x, ' (', round(prop.var[1] * 100, 1), '%)'),
-      y = paste0('PC', pc.y, ' (', round(prop.var[2] * 100, 1), '%)'),
-      title = locus
-    ) +
+    ggplot2::labs(x = prop.var['x'], y = prop.var['y']) +
     ggplot2::theme_minimal()
   
-  gg <- if(type == 'ellipse') {
-    if(!is.null(ellipse.fill)) {
-      x <- gg + ggplot2::geom_polygon(
-        ggplot2::aes(group = .data$sample, fill = .data[[ellipse.fill]]),
-        alpha = 0.8,
-        color = 'white'
-      ) 
-      if(is.numeric(df[[ellipse.fill]])) {
-        x <- x + ggplot2::scale_fill_viridis_c(option = 'viridis')
-      } else {
-        x <- x + ggplot2::scale_fill_brewer(palette = 'Set2')
-      }
-      x + ggplot2::theme(legend.position = 'top')
+  gg <- if(!is.null(ellipse.fill)) {
+    x <- gg + ggplot2::geom_polygon(
+      ggplot2::aes(group = .data$sample, fill = .data[[ellipse.fill]]),
+      alpha = 0.8,
+      color = 'white'
+    ) 
+    if(is.numeric(df[[ellipse.fill]])) {
+      x <- x + ggplot2::scale_fill_viridis_c(option = 'viridis')
     } else {
-      gg + ggplot2::geom_polygon(
-        ggplot2::aes(group = .data$sample), 
-        fill = NA, 
-        color = 'black'
-      )
+      x <- x + ggplot2::scale_fill_brewer(palette = 'Set2')
     }
+    x + ggplot2::theme(legend.position = 'top')
   } else {
-    gg +
-      ggplot2::geom_bin_2d(bins = num.bins) +
-      ggplot2::scale_fill_viridis_c(option = 'viridis') +
-      ggplot2::theme(legend.position = 'none')
+    gg + ggplot2::geom_polygon(
+      ggplot2::aes(group = .data$sample), 
+      fill = NA, 
+      color = 'black'
+    )
   }
-    
+  
   if(!is.null(facet.by)) gg <- gg + ggplot2::facet_wrap(~ .data[[facet.by]], ncol = 1)
   
   if(plot) print(gg)
