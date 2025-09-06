@@ -66,9 +66,10 @@ switchSummary <- function(
     ggplot2::ggplot() +
     ggplot2::geom_histogram(
       ggplot2::aes(.data$w, fill = .data$to.highlight),
-      binwidth = 0.05
+      breaks = seq(0, 1, by = 0.05)
     ) +
     ggplot2::xlim(c(0, 1)) +
+    ggplot2::labs(x = 'Probability of Inclusion (w)', y = 'Count') +
     ggplot2::scale_fill_manual(values = c('black', 'red')) +
     ggplot2::facet_grid(pred ~ resp) +
     ggplot2::theme(
