@@ -14,7 +14,7 @@ These instructions assume you have Docker and Docker Desktop already installed.
 
 ```
 # -t tags the image, --build-arg provides the build date (optional)
-docker build --build-arg WHEN=2025-01-25 --no-cache -t mambotest:0.1.0 .
+docker build --build-arg WHEN=2025-01-25 --no-cache -t mambo:1.0.3 .
 ```
 
 ## Loading MAMBO from the Docker image
@@ -24,18 +24,14 @@ docker build --build-arg WHEN=2025-01-25 --no-cache -t mambotest:0.1.0 .
 
 ```
 docker run --rm -it -e PASSWORD=password -p 8787:8787 \
--v "/Users/Home/MAMBO/test-files":/home/rstudio/mambotest \
-mambotest:0.1.0
+-v "/Users/Home/MAMBO/files":/home/rstudio/mambo \
+mambotest:1.0.3
 ```
 
 5. Open a browser and type in "localhost:8787" then log in with the user name "rstudio" and password "password" (or whatever you set as the password variable)
 6. Load MAMBO with library(mambo)
 
 ## Running MAMBO
-To run MAMBO, you will need two sets each of 1) ASV tables and 2) taxonomy tables. You may also include an optional metadata file.
+To run MAMBO using your own data, you will need two sets each of 1) ASV tables and 2) metadata files. You may also include optional taxonomy tables. The ASV tables should have samples as columns, ASVs as rows, and an empty A1 cell. The cell values should contain raw (untransformed) read counts. The taxonomy tables should have ASVs as rows and taxonomy ranks in subsequent columns, which each rank in its own column. 
 
-The ASV tables should have samples as columns, ASVs as rows, and an empty A1 cell. The cell values should contain raw (untransformed) read counts.
-
-The taxonomy tables should have ASVs as rows and taxonomy ranks in subsequent columns, which each rank in its own column. 
-
-See `mamboTutorial()` for examples of running the model and summarizing the results.
+See `mamboTutorial()` for examples of running the model with data used in the manuscript.
