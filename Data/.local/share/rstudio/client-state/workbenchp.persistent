@@ -1,16 +1,9 @@
 {
     "rightpanesize": {
-<<<<<<< HEAD
         "panelwidth": 1845,
         "windowwidth": 1861,
         "splitterpos": [
-            837
-=======
-        "panelwidth": 2032,
-        "windowwidth": 2048,
-        "splitterpos": [
-            1135
->>>>>>> 5aad6402b7a7163af9ac9a027625935f02670768
+            1000
         ]
     }
 }

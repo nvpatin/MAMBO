@@ -167,3 +167,161 @@
 1755723384883:save.RDS(by.cruise, "CCE_MAMBO_by_cruise.rds")
 1755723409549:saveRDS(by.cruise, "CCE_MAMBO_by_cruise.rds")
 >>>>>>> 5aad6402b7a7163af9ac9a027625935f02670768
+1757114607236:library(mambo)
+1757114672385:counts.16s
+1757114687441:lasker.samples <- sample.meta$sample[sample.meta$cruise == 'Lasker']
+1757114695211:lasker.16s <- filterCountData(counts.16s[, lasker.samples])
+1757114703552:lasker.18s <- filterCountData(counts.18s[, lasker.samples])
+1757114711305:mambo(
+1757114711306:resp.label = 'Lasker_18S',
+1757114711307:resp.counts = lasker.18s,
+1757114711308:pred.label = 'Lasker_16S',
+1757114711308:pred.counts = lasker.16s,
+1757114711309:nrep = 10,
+1757114711310:chains = 3,
+1757114711310:adapt = 100,
+1757114711311:burnin = 1000,
+1757114711312:run.label = 'Lasker'
+1757114711312:)
+1757115026120:lasker <- mambo(
+1757115026121:resp.label = 'Lasker_18S',
+1757115026122:resp.counts = lasker.18s,
+1757115026123:pred.label = 'Lasker_16S',
+1757115026123:pred.counts = lasker.16s,
+1757115026124:nrep = 10,
+1757115026124:chains = 3,
+1757115026125:adapt = 100,
+1757115026126:burnin = 1000,
+1757115026127:run.label = 'Lasker'
+1757115026128:)
+1757115165351:pca <- extractPCA(lasker)
+1757115294906:p <- plotDiversity(lasker, sample.df = sample.meta, ellipse.fill = "depth_m")
+1757115360533:plotPCs(
+1757115360534:results,
+1757115360535:locus.x = 'Lasker_16S',
+1757115360536:pc.x = 1,
+1757115360537:pc.y = 2,
+1757115360538:sample.df = sample.meta,
+1757115360539:ellipse.fill = 'depth_m'
+1757115360540:)
+1757115370839:plotPCs(
+1757115370840:lasker,
+1757115370841:locus.x = 'Lasker_16S',
+1757115370842:pc.x = 1,
+1757115370843:pc.y = 2,
+1757115370844:sample.df = sample.meta,
+1757115370844:ellipse.fill = 'depth_m'
+1757115370845:)
+1757115378577:plotPCs(
+1757115378578:lasker,
+1757115378579:locus.x = 'Lasker_16S',
+1757115378581:pc.x = 1,
+1757115378582:pc.y = 2,
+1757115378583:sample.df = sample.meta,
+1757115378584:ellipse.fill = 'depth_m'
+1757115378585:)
+1757115408427:plotPCs(
+1757115408428:results,
+1757115408429:locus.x = 'Lasker_16S',
+1757115408430:locus.y = 'Lasker_18S',
+1757115408431:pc.x = 1,
+1757115408431:pc.y = 1,
+1757115408432:sample.df = sample.meta,
+1757115408433:ellipse.fill = 'depth_m'
+1757115408434:)
+1757115432427:plotPCs(
+1757115432428:lasker,
+1757115432429:locus.x = 'Lasker_16S',
+1757115432430:locus.y = 'Lasker_18S',
+1757115432431:pc.x = 1,
+1757115432432:pc.y = 1,
+1757115432433:sample.df = sample.meta,
+1757115432434:ellipse.fill = 'depth_m'
+1757115432435:)
+1757115477667:plotPCs(
+1757115477669:lasker,
+1757115477670:locus.x = 'Lasker_16S',
+1757115477671:locus.y = 'Lasker_18S',
+1757115477672:pc.x = 2,
+1757115477673:pc.y = 2,
+1757115477674:sample.df = sample.meta,
+1757115477675:ellipse.fill = 'depth_m'
+1757115477676:)
+1757115533137:plotPCs(
+1757115533138:lasker,
+1757115533139:locus.x = 'Lasker_16S',
+1757115533140:locus.y = 'Lasker_18S',
+1757115533141:pc.x = 1,
+1757115533142:pc.y = 1,
+1757115533143:sample.df = sample.meta,
+1757115533144:ellipse.fill = 'depth_m'
+1757115533145:)
+1757115548527:pc1 <- plotPCs(
+1757115548528:lasker,
+1757115548529:locus.x = 'Lasker_16S',
+1757115548530:locus.y = 'Lasker_18S',
+1757115548531:pc.x = 1,
+1757115548532:pc.y = 1,
+1757115548533:sample.df = sample.meta,
+1757115548534:ellipse.fill = 'depth_m'
+1757115548535:)
+1757115561851:pc2 <- plotPCs(
+1757115561853:lasker,
+1757115561854:locus.x = 'Lasker_16S',
+1757115561855:locus.y = 'Lasker_18S',
+1757115561857:pc.x = 2,
+1757115561858:pc.y = 2,
+1757115561859:sample.df = sample.meta,
+1757115561860:ellipse.fill = 'depth_m'
+1757115561862:)
+1757115573260:ggsave("Lasker_16S_18S_PC1_depth.png", pc1, width = 10, height = 6, units = "in", dpi = 300, bg = "white")
+1757115580897:library(ggplot2)
+1757115582715:ggsave("Lasker_16S_18S_PC1_depth.png", pc1, width = 10, height = 6, units = "in", dpi = 300, bg = "white")
+1757115591942:ggsave("Lasker_16S_18S_PC2_depth.png", pc2, width = 10, height = 6, units = "in", dpi = 300, bg = "white")
+1757115629790:sw.smry <- switchSummary(lasker, min.p = 0.9, resp.pcs = 1:4, pred.pcs = 1:4)
+1757182953733:library(mambo)
+1757182973084:mambo(
+1757182973085:resp.label = 'Lasker_18S',
+1757182973086:resp.counts = lasker.18s,
+1757182973087:pred.label = 'Lasker_16S',
+1757182973088:pred.counts = lasker.16s,
+1757182973089:nrep = 10,
+1757182973089:chains = 3,
+1757182973090:adapt = 100,
+1757182973091:burnin = 1000,
+1757182973092:run.label = 'Lasker'
+1757182973093:)
+1757182992679:lasker.samples <- sample.meta$sample[sample.meta$cruise == 'Lasker']
+1757182998764:lasker.16s <- filterCountData(counts.16s[, lasker.samples])
+1757183004898:lasker.18s <- filterCountData(counts.18s[, lasker.samples])
+1757183012206:mambo(
+1757183012207:resp.label = 'Lasker_18S',
+1757183012208:resp.counts = lasker.18s,
+1757183012209:pred.label = 'Lasker_16S',
+1757183012210:pred.counts = lasker.16s,
+1757183012211:nrep = 10,
+1757183012212:chains = 3,
+1757183012213:adapt = 100,
+1757183012213:burnin = 1000,
+1757183012214:run.label = 'Lasker'
+1757183012215:)
+1757183162570:sw.smry <- switchSummary(results, min.p = 0.9, resp.pcs = 1:4, pred.pcs = 1:4)
+1757183184331:lasker <- mambo(
+1757183184332:resp.label = 'Lasker_18S',
+1757183184333:resp.counts = lasker.18s,
+1757183184334:pred.label = 'Lasker_16S',
+1757183184335:pred.counts = lasker.16s,
+1757183184336:nrep = 10,
+1757183184337:chains = 3,
+1757183184337:adapt = 100,
+1757183184338:burnin = 1000,
+1757183184339:run.label = 'Lasker'
+1757183184340:)
+1757183234011:lasker <- readRDS("Lasker.20250906_182332.rds")
+1757183245346:sw.smry <- switchSummary(lasker, min.p = 0.9, resp.pcs = 1:4, pred.pcs = 1:4)
+1757183259602:library(ggplot2)
+1757183323846:ggsave("Lasker-switchsummary.png", sw.smry, height = 5, width = 8, units = "in", dpi = "300", bg = "white")
+1757183334452:ggsave("Lasker-switchsummary.png", sw.smry, height = 5, width = 8, units = "in", dpi = 300, bg = "white")
+1757183351851:View(sw.smry)
+1757183370899:sw.smry$plot
+1757183379799:ggsave("Lasker-switchsummary.png", sw.smry$plot, height = 5, width = 8, units = "in", dpi = 300, bg = "white")

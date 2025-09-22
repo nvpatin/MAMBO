@@ -1,0 +1,28 @@
+{
+    "id": "498E12B5",
+    "path": null,
+    "project_path": null,
+    "type": "object_explorer",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1757183351884.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "id": "1b6ae39c398347c68beb944694ccaf64",
+        "name": "sw.smry",
+        "title": "sw.smry",
+        "language": "R",
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 0,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1757183351884,
+    "read_only": false,
+    "read_only_alternatives": []
+}

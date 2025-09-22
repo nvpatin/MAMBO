@@ -6,11 +6,7 @@
         "description": "Copies the console output of a selected expression to the system clipboard",
         "interactive": false,
         "binding": "clipr_output",
-<<<<<<< HEAD
         "ordinal": 9
-=======
-        "ordinal": 3
->>>>>>> 5aad6402b7a7163af9ac9a027625935f02670768
     },
     "clipr::clipr_result": {
         "name": "Value to clipboard",
@@ -19,11 +15,7 @@
         "description": "Copies the results of a selected expression to the system clipboard",
         "interactive": false,
         "binding": "clipr_result",
-<<<<<<< HEAD
         "ordinal": 8
-=======
-        "ordinal": 2
->>>>>>> 5aad6402b7a7163af9ac9a027625935f02670768
     },
     "covr::addin_report": {
         "name": "Calculate package test coverage",
@@ -41,11 +33,7 @@
         "description": "A wrapper for `roxygen`'s `roxygen2::roxygenize()`",
         "interactive": true,
         "binding": "document",
-<<<<<<< HEAD
         "ordinal": 6
-=======
-        "ordinal": 7
->>>>>>> 5aad6402b7a7163af9ac9a027625935f02670768
     },
     "devtools::run_examples": {
         "name": "Run examples",
@@ -54,11 +42,7 @@
         "description": "Runs R code in examples using `devtools::run_examples()`",
         "interactive": true,
         "binding": "run_examples",
-<<<<<<< HEAD
         "ordinal": 7
-=======
-        "ordinal": 8
->>>>>>> 5aad6402b7a7163af9ac9a027625935f02670768
     },
     "devtools::test_active_file": {
         "name": "Run a test file",
@@ -67,11 +51,7 @@
         "description": "Run the current test file, using `devtools::test_active_file()`.",
         "interactive": true,
         "binding": "test_active_file",
-<<<<<<< HEAD
         "ordinal": 3
-=======
-        "ordinal": 4
->>>>>>> 5aad6402b7a7163af9ac9a027625935f02670768
     },
     "devtools::test_coverage": {
         "name": "Report test coverage for a package",
@@ -80,11 +60,7 @@
         "description": "Calculate and report the test coverage for the current package, using `devtools::test_coverage()`.",
         "interactive": true,
         "binding": "test_coverage",
-<<<<<<< HEAD
         "ordinal": 5
-=======
-        "ordinal": 6
->>>>>>> 5aad6402b7a7163af9ac9a027625935f02670768
     },
     "devtools::test_coverage_active_file": {
         "name": "Report test coverage for a file",
@@ -93,11 +69,7 @@
         "description": "Calculate and report test coverage for the current test file, using `devtools::test_coverage_active_file()`.",
         "interactive": true,
         "binding": "test_coverage_active_file",
-<<<<<<< HEAD
         "ordinal": 4
-=======
-        "ordinal": 5
->>>>>>> 5aad6402b7a7163af9ac9a027625935f02670768
     },
     "pkgdown::build_site_external": {
         "name": "Build pkgdown",
@@ -106,10 +78,6 @@
         "description": "Runs pkgdown on the current package",
         "interactive": true,
         "binding": "build_site_external",
-<<<<<<< HEAD
         "ordinal": 2
-=======
-        "ordinal": 9
->>>>>>> 5aad6402b7a7163af9ac9a027625935f02670768
     }
 }
