@@ -1,10 +1,22 @@
 # MAMBO: Metabarcoding Analysis using Modeled Bayesian Occurrences
 MAMBO is program to analyze eDNA metabarcoding sequence data from multiple marker genes to identify drivers and patterns of biodiversity in ecosystems. The input consists of two metabarcoding data sets generated from two different marker genes targeting different trophic levels from the same eDNA sample. Analysis has three stages: 1) modeling sequence read counts as a beta distribution and using random draws from this distrubition to generate principal component analyses, 2) applying a Bayesian model to identify correlations between two different data sets, and 3) extracting the features (ASVs) with the greatest effect on the correlations. MAMBO originated from a team of NOAA, academic, and private sector scientists who participated in the 2023 NOAA/NCAR Hackathon in Boulder, Colorado, part of the Open Hackathons program.
 
-## Installation
-We highly recommend installing MAMBO via Docker. There are several R library dependencies that may otherwise result in conflicts.
+####There are two options for installing MAMBO: natively in R, or via Docker. 
 
-These instructions assume you have Docker and Docker Desktop already installed. 
+## Native installation
+In R, type the following command into the terminal:
+
+```
+devtools::install_github('nvpatin/mambo/mambo')
+```
+
+## Docker installation
+
+We highly recommend installing MAMBO via Docker, which will avoid any potential R library dependencies that may result in conflicts.
+
+These instructions assume you have Docker already installed. Docker Desktop is optional, and instructions for loading the image both with and without the app are below.
+
+### Building the Docker image
 
 1. Clone this repo to your local workspace. 
 
@@ -17,7 +29,7 @@ These instructions assume you have Docker and Docker Desktop already installed.
 docker build --build-arg WHEN=2025-01-25 --no-cache -t mambo:1.0.3 .
 ```
 
-## Loading MAMBO from the Docker image
+### Loading MAMBO from the Docker image
 3. Option #1: Run the image from Docker Desktop. In the "Images" menu item, hit the "play" icon for the MAMBO image. Then, expand the "Optional settings" menu. Under "Ports" type "8787" for "Host port." Under "Volumes" provide the local directory path containing the data files you need to run MAMBO (e.g., the "Data" folder in this repo; "Host path") and "/home/rstudio/{optional-name}" in the "Container path," where {optional-name} is a directory name you want for your image working directory. Under "Environment variables" set "Variable" to "PASSWORD" and "Value" to "password" (or your password of choice). Click "run" to start running the image interactively .
 
 4.  Option #2: Run the image from the command line. As with Docker Desktop, set the directory with your test files in /home/rstudio to access them from RStudio.
