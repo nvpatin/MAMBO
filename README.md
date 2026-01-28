@@ -49,3 +49,7 @@ To run MAMBO using your own data, you will need two sets each of 1) ASV tables a
 See `mamboTutorial()` for examples of running the model with data used in the manuscript. See below for a conceptual overview of the MAMBO workflow.
 
 ![alt text](https://github.com/nvpatin/MAMBO/blob/main/FigureS1.png?raw=true)
+
+## Troubleshooting
+
+Both JAGS and its R interface, rjags, should be installed with the 'mambo' library. However, occasionally this installation fails. If you get a warning saying JAGS can't be fund, even after loading the 'rjags' library manually, you may have to install JAGS from source: https://sourceforge.net/projects/mcmc-jags/
