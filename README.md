@@ -1,7 +1,7 @@
 # MAMBO: Metabarcoding Analysis using Modeled Bayesian Occurrences
 MAMBO is program to analyze eDNA metabarcoding sequence data from multiple marker genes to identify drivers and patterns of biodiversity in ecosystems. The input consists of two metabarcoding data sets generated from two different marker genes targeting different trophic levels from the same eDNA sample. Analysis has three stages: 1) modeling sequence read counts as a beta distribution and using random draws from this distrubition to generate principal component analyses, 2) applying a Bayesian model to identify correlations between two different data sets, and 3) extracting the features (ASVs) with the greatest effect on the correlations. MAMBO originated from a team of NOAA, academic, and private sector scientists who participated in the 2023 NOAA/NCAR Hackathon in Boulder, Colorado, part of the Open Hackathons program.
 
-####There are two options for installing MAMBO: natively in R, or via Docker. 
+#### There are two options for installing MAMBO: natively in R, or via Docker. We suggest the native installation if possible.
 
 ## Native installation
 In R, type the following command into the terminal:
@@ -9,6 +9,8 @@ In R, type the following command into the terminal:
 ```
 devtools::install_github('nvpatin/mambo/mambo')
 ```
+
+If you get an error regarding rjags, you may have to install JAGS from source: [https://sourceforge.net/projects/mcmc-jags/]()
 
 ## Docker installation
 
@@ -46,7 +48,9 @@ mambotest:1.0.3
 ## Running MAMBO
 To run MAMBO using your own data, you will need two sets each of 1) ASV tables and 2) metadata files. You may also include optional taxonomy tables. The ASV tables should have samples as columns, ASVs as rows, and an empty A1 cell. The cell values should contain raw (untransformed) read counts. The taxonomy tables should have ASVs as rows and taxonomy ranks in subsequent columns, which each rank in its own column. 
 
-See `mamboTutorial()` for examples of running the model with data used in the manuscript. See below for a conceptual overview of the MAMBO workflow.
+See `mambo_Tutorial()` for examples of running the model with data used in the manuscript. An html file of this tutorial also exists in the parent directory of this repository. You must clone the repo or download the file to open it.
+
+See below for a conceptual overview of the MAMBO workflow.
 
 ![alt text](https://github.com/nvpatin/MAMBO/blob/main/FigureS1.png?raw=true)
 
