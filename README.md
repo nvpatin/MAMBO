@@ -52,7 +52,7 @@ See `mambo_Tutorial()` for examples of running the model with data used in the m
 
 See below for a conceptual overview of the MAMBO workflow.
 
-![alt text](https://github.com/nvpatin/MAMBO/tree/main/Manuscript/FigureS1.png?raw=true)
+![alt text](https://github.com/nvpatin/MAMBO/blob/main/Manuscript/FigureS1.png?raw=true)
 
 ## Troubleshooting
 
