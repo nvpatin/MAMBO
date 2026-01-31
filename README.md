@@ -14,7 +14,7 @@ If you get an error regarding rjags, you may have to install JAGS from source: [
 
 ## Docker installation
 
-We highly recommend installing MAMBO via Docker, which will avoid any potential R library dependencies that may result in conflicts.
+Installing MAMBO via Docker will avoid any potential R library dependencies that may result in conflicts. However, because RStudio is included in the Docker image, you may run into errors on a Linux system without GUI capabilities. If you want to run MAMBO on such a system, we strongly recommend the native installation which will allow you to run MAMBO via the R command line.
 
 These instructions assume you have Docker already installed. Docker Desktop is optional, and instructions for loading the image both with and without the app are below.
 
