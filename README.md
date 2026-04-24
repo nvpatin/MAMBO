@@ -10,6 +10,21 @@ In R, type the following command into the terminal:
 devtools::install_github('nvpatin/mambo/mambo')
 ```
 
+MAMBO depends on several R libraries; please see below for the full list and installation commands. For system-wide dependencies, please refer to the Dockerfile located in the "Docker" directory.
+
+#### R dependencies
+
+```
+install.packages('udunits2', repos='http://cran.us.r-project.org/')
+install.packages('httpuv')
+install.packages('devtools')
+install.packages(c('rjags'), dependencies=TRUE)
+install.packages(c('abind', 'runjags', 'dplyr', 'purrr', 'ggplot2'), dependencies=TRUE)
+install.packages(c('car'),  dependencies=TRUE)
+install.packages(c('swfscMisc'), repos='http://cran.rstudio.com/', dependencies=TRUE)
+devtools::install_github('ericarcher/sprex')
+```
+
 If you get an error regarding rjags, you may have to install JAGS from source: [https://sourceforge.net/projects/mcmc-jags/]()
 
 ## Docker installation
