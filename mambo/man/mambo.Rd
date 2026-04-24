@@ -6,10 +6,10 @@
 \title{Run MAMBO replicates}
 \usage{
 mambo(
-  resp.label,
   resp.counts,
-  pred.label,
+  resp.label,
   pred.counts,
+  pred.label,
   nrep = 10,
   num.cores = parallel::detectCores() - 1,
   num.resp.pcs = NULL,
@@ -27,13 +27,13 @@ mambo(
 mamboTutorial()
 }
 \arguments{
-\item{resp.label}{label for response locus.}
-
 \item{resp.counts}{ASV counts of response locus.}
 
-\item{pred.label}{label for predictor locus.}
+\item{resp.label}{label for response locus.}
 
 \item{pred.counts}{ASV counts of predictor locus.}
+
+\item{pred.label}{label for predictor locus.}
 
 \item{nrep}{number of MAMBO replicates to run.}
 

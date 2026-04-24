@@ -52,10 +52,10 @@ lasker.18s <- filterCountData(counts.18s[, lasker.samples])
 To run the main function, `mambo()`, we need to supply labels for the response and predictor datasets and the response and predictor count tables, along with the number of replicates (`nrep`) and parameters for the Bayesian MCMC run (see `?mambo`). One can also specify a label for the run ('`run.label`') that will be used for the log and results file. By default, this is set to '`mambo`'. 
 ```{r, echo = TRUE, cache=TRUE}
 results <- mambo(
-  resp.label = 'Lasker_18S', 
   resp.counts = lasker.18s, 
-  pred.label = 'Lasker_16S', 
+  resp.label = 'Lasker_18S', 
   pred.counts = lasker.16s, 
+  pred.label = 'Lasker_16S', 
   nrep = 10, 
   chains = 3,
   adapt = 100,
@@ -67,10 +67,10 @@ results <- mambo(
 To skip the Bayesian modeling and just compute diversity and run the PCAs, set `bayesian = FALSE`:
 ```{r, echo = TRUE, eval = FALSE, cache=TRUE}
 results <- mambo(
-  resp.label = 'Lasker_18S', 
   resp.counts = lasker.18s, 
-  pred.label = 'Lasker_16S', 
+  resp.label = 'Lasker_18S', 
   pred.counts = lasker.16s, 
+  pred.label = 'Lasker_16S', 
   nrep = 10, 
   bayesian = FALSE,
   label = 'Lasker'

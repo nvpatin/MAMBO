@@ -1,10 +1,10 @@
 #' @title Run MAMBO replicates
 #' @description Run MAMBO replicates
 #'
-#' @param resp.label label for response locus.
 #' @param resp.counts ASV counts of response locus.
-#' @param pred.label label for predictor locus.
+#' @param resp.label label for response locus.
 #' @param pred.counts ASV counts of predictor locus.
+#' @param pred.label label for predictor locus.
 #' @param nrep number of MAMBO replicates to run.
 #' @param num.cores number of cores to use for sampling relative percent 
 #'    occurrence. Defaults to value reported by \link[parallel]{detectCores} 
@@ -45,8 +45,8 @@
 #' @export
 #'
 mambo <- function(
-    resp.label, resp.counts, 
-    pred.label, pred.counts,
+    resp.counts, resp.label, 
+    pred.counts, pred.label,
     nrep = 10,
     num.cores = parallel::detectCores() - 1,
     num.resp.pcs = NULL,
