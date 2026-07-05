@@ -12,6 +12,7 @@
 #' @author Eric Archer \email{eric.ivan.archer@@gmail.com}
 #' 
 ranRelPct <- function(beta.params, num.cores = parallel::detectCores(logical = FALSE) - 1) {
+  if(is.null(beta.params)) return(NULL)
   param.dim <- dim(beta.params)[1:2]
   # draw random sample from beta distribution with shape parameters 'p'
   pct <- parallel::mclapply(1:prod(param.dim), function(i) {

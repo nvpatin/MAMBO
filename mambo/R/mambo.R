@@ -45,8 +45,10 @@
 #' @export
 #'
 mambo <- function(
-    resp.counts, resp.label, 
-    pred.counts, pred.label,
+    resp.counts, 
+    resp.label = NULL, 
+    pred.counts = NULL, 
+    pred.label = NULL,
     nrep = 10,
     num.cores = parallel::detectCores() - 1,
     num.resp.pcs = NULL,
@@ -56,12 +58,21 @@ mambo <- function(
     adapt = 100,
     burnin = 1000,
     total.samples = 1000,
-    thin = 1,
+    thin = 10,
     run.label = 'mambo',
     output.log = TRUE
 ) {
   res <- NULL
   start.time <- Sys.time()
+  
+  resp.only <- is.null(pred.counts)
+  if(is.null(resp.label)) resp.label <- 'Response_Counts'
+  if(is.null(pred.label)) pred.label <- 'Predictor_Counts'
+  if(resp.only) {
+    bayesian <- FALSE
+    pred.label <- NULL
+  }
+  
   tryCatch({
     if(output.log) {
       log.fname <- paste0(run.label, '.', format(start.time, '%Y%m%d_%H%M%S.log'))
@@ -87,13 +98,15 @@ mambo <- function(
     pred.beta <- betaParams(pred.counts)
     
     # check that the same sample names are in both datasets
-    if(!setequal(
-      sort(dimnames(resp.beta)[[1]]), 
-      sort(dimnames(pred.beta)[[1]])
-    )) stop("sample names in 'resp.counts' and 'pred.counts' are not the same.")
+    if(!resp.only) {
+      if(!setequal(
+        sort(dimnames(resp.beta)[[1]]), 
+        sort(dimnames(pred.beta)[[1]])
+      )) stop("sample names in 'resp.counts' and 'pred.counts' are not the same.")
+    }
     
     # make sure rows are in same order for both sets of data
-    resp.beta <- resp.beta[dimnames(pred.beta)[[1]], , ]
+    if(!resp.only) resp.beta <- resp.beta[dimnames(pred.beta)[[1]], , ]
     
     # do nrep iterations, save results to list, and write to RDS file
     reps <- lapply(1:nrep, function(i) {
@@ -109,14 +122,15 @@ mambo <- function(
       
       # Diversity ---------------------------------------------------------------
       cat(' ', format(Sys.time()), 'Diversity...\n')
-      total.diversity <- stats::setNames(
-        c(sprex::diversity(rowSums(resp.abund)), sprex::diversity(rowSums(pred.abund))),
-        c(resp.label, pred.label)
-      )
+      total.diversity <- sprex::diversity(rowSums(resp.abund))
+      if(!resp.only) {
+        total.diversity <- c(total.diversity, sprex::diversity(rowSums(pred.abund)))
+      }
+      total.diversity <- stats::setNames(total.diversity, c(resp.label, pred.label))
       
       sample.diversity <- cbind(
         sprex::diversity(resp.abund),
-        sprex::diversity(pred.abund)
+        if(!resp.only) sprex::diversity(pred.abund) else NULL
       ) |> 
         as.data.frame() |> 
         stats::setNames(c(resp.label, pred.label)) |> 
@@ -124,17 +138,19 @@ mambo <- function(
       
       # Extract PCs -------------------------------------------------------------
       cat(' ', format(Sys.time()), 'PCA...\n')
-      pca <- stats::setNames(
-        list(
-          resp.abund |> 
-            ranPCA() |> 
-            impPCs(num.resp.pcs),
+      pca <- resp.abund |> 
+        ranPCA() |> 
+        impPCs(num.resp.pcs) |> 
+        list()
+      if(!resp.only) {
+        pca <- c(pca, 
           pred.abund |> 
             ranPCA() |> 
-            impPCs(num.pred.pcs)
-        ),
-        c(resp.label, pred.label)
-      )
+            impPCs(num.pred.pcs) |> 
+            list()
+        )
+      }
+      pca <- stats::setNames(pca, c(resp.label, pred.label))
       
       post.smry <- p <- NULL
       if(bayesian) {

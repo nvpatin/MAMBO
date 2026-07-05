@@ -1,8 +1,6 @@
 "_PACKAGE"
 #' @name mambo_package
-#' \code{mambo} package
-#'
-#' Metabarcoding Analysis using Modeled Bayesian Occurrences
+#' @title Metabarcoding Analysis using Modeled Bayesian Occurrences
 #' 
 #' @keywords internal
 #' @importFrom rlang .data

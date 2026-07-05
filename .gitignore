@@ -10,3 +10,4 @@ bayesian_results/*
 *.log
 *.rds
 GOMECC Data/
+.positai

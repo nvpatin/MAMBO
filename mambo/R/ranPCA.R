@@ -10,6 +10,7 @@
 #' @author Eric Archer \email{eric.ivan.archer@@gmail.com}
 #'
 ranPCA <- function(rel.abund) {
+  if(is.null(rel.abund)) return(NULL)
   prob <- t(rel.abund)
   log(prob / (1 - prob)) |>
     stats::prcomp() |>

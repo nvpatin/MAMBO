@@ -6,8 +6,8 @@
 \usage{
 outlierLoadings(
   results,
-  locus,
-  pc,
+  locus = NULL,
+  pc = 1,
   type = c("z", "iqr"),
   thresh = 3,
   min.pct.reps = 0.95

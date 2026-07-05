@@ -6,7 +6,7 @@
 \usage{
 plotPCs(
   results,
-  locus.x,
+  locus.x = NULL,
   locus.y = locus.x,
   pc.x = 1,
   pc.y = 2,

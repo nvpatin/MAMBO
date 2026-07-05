@@ -7,9 +7,9 @@
 \usage{
 mambo(
   resp.counts,
-  resp.label,
-  pred.counts,
-  pred.label,
+  resp.label = NULL,
+  pred.counts = NULL,
+  pred.label = NULL,
   nrep = 10,
   num.cores = parallel::detectCores() - 1,
   num.resp.pcs = NULL,
@@ -19,7 +19,7 @@ mambo(
   adapt = 100,
   burnin = 1000,
   total.samples = 1000,
-  thin = 1,
+  thin = 10,
   run.label = "mambo",
   output.log = TRUE
 )

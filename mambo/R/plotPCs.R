@@ -27,11 +27,12 @@
 #' @export
 #'
 plotPCs <- function(
-    results, locus.x, locus.y = locus.x, pc.x = 1, pc.y = 2, 
+    results, locus.x = NULL, locus.y = locus.x, pc.x = 1, pc.y = 2, 
     ellipse.p = 0.95, sample.df = NULL, ellipse.fill = NULL,
     facet.by = NULL, plot = TRUE
 ) {
-  if(missing(locus.x)) stop("'locus.x' must be specified.")
+  if(is.null(locus.x)) locus.x <- results$labels['resp']
+  
   if(!locus.x %in% results$labels[c('resp', 'pred')]) {
     stop("locus '", locus.x, "' is not in 'results'")
   }

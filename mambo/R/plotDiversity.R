@@ -22,6 +22,10 @@ plotDiversity <- function(
     results, ellipse.p = 0.95,  sample.df = NULL, ellipse.fill = NULL, 
     facet.by = NULL, log.axes = TRUE,  plot = TRUE
 ) {
+  if(is.na(results$labels['pred'])) {
+    stop("'results' must have both response and predictor values.")
+  }
+  
   if(!is.null(ellipse.fill)) {
     if(!ellipse.fill %in% names(sample.df)) {
       stop("'", ellipse.fill, "' not in 'sample.df'")
@@ -34,8 +38,8 @@ plotDiversity <- function(
     }
   }
   
-  pred <- results$labels['pred']
   resp <- results$labels['resp']
+  pred <- results$labels['pred']
   
   df <- results$reps |> 
     lapply(function(x) x$sample.diversity) |> 
