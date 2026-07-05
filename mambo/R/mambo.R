@@ -2,9 +2,13 @@
 #' @description Run MAMBO replicates
 #'
 #' @param resp.counts ASV counts of response locus.
-#' @param resp.label label for response locus.
-#' @param pred.counts ASV counts of predictor locus.
-#' @param pred.label label for predictor locus.
+#' @param resp.label label for response locus. If not specified it will default 
+#' to 'Response_Locus'.
+#' @param pred.counts ASV counts of predictor locus. If not specified then no 
+#' Bayesian analysis will be done and only the PCA and diversity will be computed 
+#' for the response locus.
+#' @param pred.label label for predictor locus. If not specified it will default 
+#' to 'Predictor_Locus'.
 #' @param nrep number of MAMBO replicates to run.
 #' @param num.cores number of cores to use for sampling relative percent 
 #'    occurrence. Defaults to value reported by \link[parallel]{detectCores} 
@@ -66,8 +70,8 @@ mambo <- function(
   start.time <- Sys.time()
   
   resp.only <- is.null(pred.counts)
-  if(is.null(resp.label)) resp.label <- 'Response_Counts'
-  if(is.null(pred.label)) pred.label <- 'Predictor_Counts'
+  if(is.null(resp.label)) resp.label <- 'Response_Locus'
+  if(is.null(pred.label)) pred.label <- 'Predictor_Locus'
   if(resp.only) {
     bayesian <- FALSE
     pred.label <- NULL

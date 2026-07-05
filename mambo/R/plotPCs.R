@@ -3,7 +3,8 @@
 #' from multiple \code{MAMBO} replicates.
 #'
 #' @param results output of a \code{mambo} run.
-#' @param locus.x label name of response or predictor locus for x-axis.
+#' @param locus.x label name of response or predictor locus for x-axis. If not 
+#' specified, then it defaults to the response locus. 
 #' @param locus.y label name of response or predictor locus fo y-axis. If not 
 #' specified, then it defaults to \code{locus.x}. The plot will then be a 
 #' PCA biplot for a single locus.

@@ -29,11 +29,15 @@ mamboTutorial()
 \arguments{
 \item{resp.counts}{ASV counts of response locus.}
 
-\item{resp.label}{label for response locus.}
+\item{resp.label}{label for response locus. If not specified it will default 
+to 'Response_Locus'.}
 
-\item{pred.counts}{ASV counts of predictor locus.}
+\item{pred.counts}{ASV counts of predictor locus. If not specified then no 
+Bayesian analysis will be done and only the PCA and diversity will be computed 
+for the response locus.}
 
-\item{pred.label}{label for predictor locus.}
+\item{pred.label}{label for predictor locus. If not specified it will default 
+to 'Predictor_Locus'.}
 
 \item{nrep}{number of MAMBO replicates to run.}
 
