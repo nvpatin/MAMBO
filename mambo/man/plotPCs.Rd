@@ -6,7 +6,7 @@
 \usage{
 plotPCs(
   results,
-  locus.x,
+  locus.x = NULL,
   locus.y = locus.x,
   pc.x = 1,
   pc.y = 2,
@@ -20,7 +20,8 @@ plotPCs(
 \arguments{
 \item{results}{output of a \code{mambo} run.}
 
-\item{locus.x}{label name of response or predictor locus for x-axis.}
+\item{locus.x}{label name of response or predictor locus for x-axis. If not 
+specified, then it defaults to the response locus.}
 
 \item{locus.y}{label name of response or predictor locus fo y-axis. If not 
 specified, then it defaults to \code{locus.x}. The plot will then be a 

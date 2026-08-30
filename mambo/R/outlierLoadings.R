@@ -16,8 +16,10 @@
 #' @export
 #'
 outlierLoadings <- function(
-  results, locus, pc, type = c('z', 'iqr'), thresh = 3, min.pct.reps = 0.95
+  results, locus = NULL, pc = 1, type = c('z', 'iqr'), thresh = 3, min.pct.reps = 0.95
 ) {
+  if(is.null(locus)) locus <- results$labels['resp']
+  
   extractPCA(results)$loadings |> 
     dplyr::rename(p = 'pc', l = 'locus') |> 
     dplyr::filter(.data$p == pc & .data$l == locus) |> 

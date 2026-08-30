@@ -13,6 +13,7 @@
 #' @author Eric Archer \email{eric.ivan.archer@@gmail.com}
 #'
 impPCs <- function(pca, num.pcs = NULL) {
+  if(is.null(pca)) return(NULL)
   # number of important PCs = as many as account for expected variance
   imp.gt.exp <- pca$importance["Proportion of Variance", ] >= (1 / ncol(pca$importance))
   n.imp <- max(1, which.min(imp.gt.exp) - 1)

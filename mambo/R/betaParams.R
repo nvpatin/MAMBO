@@ -12,6 +12,7 @@
 #' @author Eric Archer \email{eric.ivan.archer@@gmail.com}
 #'
 betaParams <- function(x) {
+  if(is.null(x)) return(NULL)
   # read data if filename is given
   if(is.character(x)) x <- utils::read.delim(x, row.names = 1)
   x <- as.matrix(x)
